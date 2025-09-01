@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import FaqComponent from '@/components/FaqQuestion';
 import { Card, cardData } from '@/components/Card';
 import { CircleCheck, } from 'lucide-react';
-import { AppleLogo, GooglePlayLogo, StoreButton } from '@/StoreButton';
+import { GooglePlayLogo, StoreButton } from '@/StoreButton';
 
 export default function HomePage() {
     return (

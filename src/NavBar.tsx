@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { AppleLogo, GooglePlayLogo, StoreButton } from "@/StoreButton"
+import { GooglePlayLogo, StoreButton } from "@/StoreButton"
 
 const NAV_LINKS = [
     { href: "#home", label: "Home" },
