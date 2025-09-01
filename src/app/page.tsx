@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import FaqComponent from '@/components/FaqQuestion';
 import { Card, cardData } from '@/components/Card';
 import { CircleCheck, } from 'lucide-react';
-import { AppleLogo, GooglePlayLogo, StoreButton } from '@/StoreButton';
+import { GooglePlayLogo, StoreButton } from '@/StoreButton';
 
 export default function HomePage() {
     return (
@@ -133,12 +133,12 @@ export default function HomePage() {
                         </p>
                     </div>
                     <div className="flex flex-wrap gap-3 justify-center lg:justify-end">
-                        <StoreButton
+                        {/* <StoreButton
                             href={`${process.env.NEXT_PUBLIC_APP_STORE_LINK}`}
                             logo={<AppleLogo />}
                             label="Download on the"
                             storeName="App Store"
-                        />
+                        /> */}
                         <StoreButton href={`${process.env.NEXT_PUBLIC_PLAY_STORE_LINK}`}
                             logo={<GooglePlayLogo />}
                             label={'Download on the'} storeName={'Google Play Store'} />

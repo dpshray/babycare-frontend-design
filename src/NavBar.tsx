@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { AppleLogo, GooglePlayLogo, StoreButton } from "@/StoreButton"
+import { GooglePlayLogo, StoreButton } from "@/StoreButton"
 
 const NAV_LINKS = [
     { href: "#home", label: "Home" },
@@ -59,12 +59,12 @@ export default function NavBar() {
                         </div>
 
                         <div className="hidden lg:flex items-center gap-2">
-                            <StoreButton
+                            {/* <StoreButton
                                 href={`${process.env.NEXT_PUBLIC_APP_STORE_LINK}`}
                                 logo={<AppleLogo />}
                                 label="Download on the"
                                 storeName="App Store"
-                            />
+                            /> */}
                             <StoreButton
                                 href={`${process.env.NEXT_PUBLIC_PLAY_STORE_LINK}`}
                                 logo={<GooglePlayLogo />}
