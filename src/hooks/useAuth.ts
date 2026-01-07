@@ -20,7 +20,7 @@ export interface LoggedInUserResponse {
 }
 
 export const useAuth = () => {
-    const {data, isLoading, error} = useQuery<LoggedInUserResponse, Error>({
+    const {data, isLoading, error ,refetch} = useQuery<LoggedInUserResponse, Error>({
         queryKey: ["auth", "me"],
         queryFn: async () => {
             try {
@@ -33,15 +33,16 @@ export const useAuth = () => {
             }
         },
         retry: false,
-        staleTime: 10 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
     });
 
     return {
         user: data?.data,
         isLoading,
         error: error?.message || error,
-        isAuthenticated: !!data?.data
+        isAuthenticated: !!data?.data,
+        refetchAuth: refetch,
+
     };
 };

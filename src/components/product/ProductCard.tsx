@@ -44,6 +44,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({product, className}
                 toast.success(res.message || "Product added to cart");
             }),
         onSuccess: () => queryClient.invalidateQueries({queryKey: ["cart"]}),
+        onError: (error) => {
+            toast.error(error?.message || "Please try again");
+        },
     });
 
     const {mutate: toggleFavorite, isPending: isFavoritePending} = useMutation({
@@ -54,6 +57,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({product, className}
             setIsLiked((prev) => !prev);
             queryClient.invalidateQueries({queryKey: ["products"]});
             queryClient.invalidateQueries({queryKey: ["favorites"]});
+        },
+        onError: (error) => {
+            toast.error(error?.message || "Please try again");
         },
     });
 

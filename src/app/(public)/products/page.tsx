@@ -38,14 +38,16 @@ const ProductSkeleton = () => (
 )
 
 function ProductList() {
-    const [page, setPage] = useState(1)
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-    const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const searchParams = useSearchParams()
 
     const query = searchParams.get("q") || ""
+    const categoryFromUrl = searchParams.get("category")
+
+    const [page, setPage] = useState(1)
     const [search, setSearch] = useState(query)
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryFromUrl)
+    const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     const {products, isLoading, totalPages} = useProducts({
         page,
@@ -59,7 +61,7 @@ function ProductList() {
     const {brands, isLoading: isLoadingBrands} = useBrands()
 
     const hasActiveFilters = useMemo(
-        () => !!(selectedCategory || selectedBrand || search),
+        () => Boolean(selectedCategory || selectedBrand || search),
         [selectedCategory, selectedBrand, search]
     )
 
@@ -70,13 +72,13 @@ function ProductList() {
         setPage(1)
     }, [])
 
-    const handleCategoryChange = useCallback((categoryName: string) => {
-        setSelectedCategory((prev) => (prev === categoryName ? null : categoryName))
+    const handleCategoryChange = useCallback((slug: string) => {
+        setSelectedCategory(prev => (prev === slug ? null : slug))
         setPage(1)
     }, [])
 
-    const handleBrandChange = useCallback((brandName: string) => {
-        setSelectedBrand((prev) => (prev === brandName ? null : brandName))
+    const handleBrandChange = useCallback((slug: string) => {
+        setSelectedBrand(prev => (prev === slug ? null : slug))
         setPage(1)
     }, [])
 
@@ -119,9 +121,9 @@ function ProductList() {
                                         <div key={cat.slug} className="flex items-center gap-3 group">
                                             <Checkbox
                                                 id={`cat-${cat.slug}`}
-                                                checked={selectedCategory === cat.name}
-                                                onCheckedChange={() => handleCategoryChange(cat.name)}
-                                                className={'border-primary hover:border-primary/50'}
+                                                checked={selectedCategory === cat.slug}
+                                                onCheckedChange={() => handleCategoryChange(cat.slug)}
+                                                className="border-primary hover:border-primary/50"
                                             />
                                             <Label
                                                 htmlFor={`cat-${cat.slug}`}
@@ -147,8 +149,8 @@ function ProductList() {
                                         <div key={brand.slug} className="flex items-center gap-3 group">
                                             <Checkbox
                                                 id={`brand-${brand.slug}`}
-                                                checked={selectedBrand === brand.name}
-                                                onCheckedChange={() => handleBrandChange(brand.name)}
+                                                checked={selectedBrand === brand.slug}
+                                                onCheckedChange={() => handleBrandChange(brand.slug)}
                                             />
                                             <Label
                                                 htmlFor={`brand-${brand.slug}`}
@@ -207,16 +209,14 @@ function ProductList() {
                     </div>
 
                     {isLoading ? (
-                        <div
-                            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                             {Array.from({length: 12}).map((_, i) => (
                                 <ProductSkeleton key={i}/>
                             ))}
                         </div>
                     ) : products.length > 0 ? (
                         <>
-                            <div
-                                className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {products.map((product) => (
                                     <ProductCard key={product.slug} product={product}/>
                                 ))}

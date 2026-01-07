@@ -4,7 +4,7 @@ import {useCallback, useEffect, useRef, useState} from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {useRouter} from "next/navigation"
-import {Heart, LogOutIcon, Mail, MapPin, Menu, Phone, Search, ShoppingCart, Smartphone, User, X} from "lucide-react"
+import {Heart, LogOut, Mail, MapPin, Menu, Phone, Search, ShoppingCart, Smartphone, User, X} from "lucide-react"
 import {toast} from "sonner"
 import {Button} from "@/components/ui/button"
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
@@ -29,7 +29,7 @@ const navigationLinks = [
 ] as const
 
 export default function NavigationBar({className}: { className?: string }) {
-    const {user, isLoading} = useAuth()
+    const {user, isLoading, refetchAuth} = useAuth()
     const router = useRouter()
     const searchInputRef = useRef<HTMLInputElement>(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -40,16 +40,19 @@ export default function NavigationBar({className}: { className?: string }) {
     const favoritesCount = user?.favourate_item_count ?? 0
 
     const toggleMobileMenu = useCallback(() => {
-        setIsMobileMenuOpen(prev => !prev);
+        setIsMobileMenuOpen(prev => !prev)
         setIsSearchOpen(false)
     }, [])
+
     const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), [])
+
     const toggleSearch = useCallback(() => {
-        setIsSearchOpen(prev => !prev);
+        setIsSearchOpen(prev => !prev)
         setIsMobileMenuOpen(false)
     }, [])
+
     const closeSearch = useCallback(() => {
-        setIsSearchOpen(false);
+        setIsSearchOpen(false)
         setSearchQuery("")
     }, [])
 
@@ -70,20 +73,24 @@ export default function NavigationBar({className}: { className?: string }) {
             localStorage.removeItem("_baby")
             toast.success("Logout successful", {id: toastId})
             router.push("/")
+            await refetchAuth()
         } catch (error: any) {
             toast.error(error?.message || "Logout failed", {id: toastId})
         }
-    }, [router])
+    }, [refetchAuth, router])
 
     const handleProfile = useCallback(() => router.push("/profile"), [router])
 
     useEffect(() => {
-        if (isSearchOpen && searchInputRef.current) searchInputRef.current.focus()
+        if (isSearchOpen && searchInputRef.current) {
+            searchInputRef.current.focus()
+        }
     }, [isSearchOpen])
+
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                if (isSearchOpen) closeSearch();
+                if (isSearchOpen) closeSearch()
                 if (isMobileMenuOpen) closeMobileMenu()
             }
         }
@@ -92,7 +99,7 @@ export default function NavigationBar({className}: { className?: string }) {
     }, [isSearchOpen, isMobileMenuOpen, closeSearch, closeMobileMenu])
 
     useEffect(() => {
-        document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
+        document.body.style.overflow = isMobileMenuOpen ? "hidden" : ""
         return () => {
             document.body.style.overflow = ""
         }
@@ -147,7 +154,7 @@ export default function NavigationBar({className}: { className?: string }) {
                             </Button>
                             <Button variant="destructive" size="sm" onClick={handleLogout}
                                     className="justify-start gap-2">
-                                <LogOutIcon className="h-4 w-4"/> Logout
+                                <LogOut className="h-4 w-4"/> Logout
                             </Button>
                         </div>
                     </div>
@@ -187,24 +194,49 @@ export default function NavigationBar({className}: { className?: string }) {
             </div>
 
             <nav className="border-b">
-                <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-                        <Image src="/logo.png"
-                               alt="BabyCare Logo"
-
-                               width={100} height={100}/>
+                <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                    <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity flex-shrink-0">
+                        <Image src="/logo.png" alt="BabyCare Logo" width={100} height={100}/>
                     </Link>
 
-                    <div className="hidden lg:flex gap-6">
-                        {navigationLinks.map(link => (
-                            <Link key={link.href} href={link.href}
-                                  className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                                {link.label}
-                            </Link>
-                        ))}
+                    <div className="hidden lg:flex flex-1 max-w-3xl mx-4">
+                        {isSearchOpen ? (
+                            <form onSubmit={handleSearch} className="relative w-full flex gap-2">
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" aria-hidden="true"/>
+                                    <Input
+                                        ref={searchInputRef}
+                                        type="search"
+                                        value={searchQuery}
+                                        onChange={e => setSearchQuery(e.target.value)}
+                                        placeholder="Search for baby products..."
+                                        className="pl-10 pr-4 h-10 w-full"
+                                        aria-label="Search products"
+                                        autoComplete="off"
+                                    />
+                                </div>
+                                <Button
+                                    type="submit"
+                                    size="sm"
+                                    className="h-10 px-6 flex-shrink-0"
+                                    disabled={!searchQuery.trim()}
+                                >
+                                    Search
+                                </Button>
+                            </form>
+                        ) : (
+                            <div className="flex gap-6 items-center justify-center w-full">
+                                {navigationLinks.map(link => (
+                                    <Link key={link.href} href={link.href}
+                                          className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors whitespace-nowrap">
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                         <Button variant="ghost" size="icon" onClick={toggleSearch}
                                 aria-label={isSearchOpen ? "Close search" : "Open search"}>
                             {isSearchOpen ? <X className="h-5 w-5"/> : <Search className="h-5 w-5"/>}
@@ -212,53 +244,111 @@ export default function NavigationBar({className}: { className?: string }) {
 
                         {user ? (
                             <>
-                                <Link href="/cart" className="relative">
+                                <Link href="/cart" className="relative hidden sm:block">
                                     <Button variant="ghost" size="icon" aria-label="Shopping cart">
                                         <ShoppingCart className="h-5 w-5"/>
                                     </Button>
                                     {renderBadge(cartCount, "orange")}
                                 </Link>
-                                <Link href="/favorites" className="relative">
+                                <Link href="/favorites" className="relative hidden sm:block">
                                     <Button variant="ghost" size="icon" aria-label="Favorites">
                                         <Heart className="h-5 w-5"/>
                                     </Button>
                                     {renderBadge(favoritesCount, "red")}
                                 </Link>
-                                {renderUserAvatar()}
+                                <div className="hidden sm:block">
+                                    {renderUserAvatar()}
+                                </div>
                             </>
                         ) : isLoading ? (
-                            <div className="h-9 w-9 rounded-full bg-muted animate-pulse"/>
+                            <div className="h-9 w-9 rounded-full bg-muted animate-pulse hidden sm:block"/>
                         ) : (
-                            <Button asChild>
+                            <Button asChild className="hidden sm:flex">
                                 <Link href="/login">Login</Link>
                             </Button>
                         )}
 
-                        <Button variant="ghost" size="icon" className="lg:hidden"
-                                onClick={() => setIsMobileMenuOpen(prev => !prev)}
+                        <Button variant="ghost" size="icon" className="lg:hidden" onClick={toggleMobileMenu}
                                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}>
                             {isMobileMenuOpen ? <X className="h-5 w-5"/> : <Menu className="h-5 w-5"/>}
                         </Button>
                     </div>
                 </div>
 
-                {isSearchOpen && (
-                    <form onSubmit={handleSearch} className="container mx-auto px-4 py-2 lg:hidden">
-                        <Input ref={searchInputRef} type="search" value={searchQuery}
-                               onChange={e => setSearchQuery(e.target.value)} placeholder="Search products..."
-                               aria-label="Search products"/>
-                    </form>
-                )}
-
                 {isMobileMenuOpen && (
                     <div className="lg:hidden border-t bg-background">
                         <div className="flex flex-col p-4 gap-2">
+                            {isSearchOpen && (
+                                <form onSubmit={handleSearch} className="mb-4">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" aria-hidden="true"/>
+                                        <Input
+                                            ref={searchInputRef}
+                                            type="search"
+                                            value={searchQuery}
+                                            onChange={e => setSearchQuery(e.target.value)}
+                                            placeholder="Search for baby products..."
+                                            className="pl-10 pr-4 h-10 w-full"
+                                            aria-label="Search products"
+                                            autoComplete="off"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        className="w-full mt-2"
+                                        size="sm"
+                                        disabled={!searchQuery.trim()}
+                                    >
+                                        Search
+                                    </Button>
+                                </form>
+                            )}
                             {navigationLinks.map(link => (
                                 <Link key={link.href} href={link.href} onClick={closeMobileMenu}
                                       className="py-2 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors">
                                     {link.label}
                                 </Link>
                             ))}
+                            {user ? (
+                                <>
+                                    <div className="sm:hidden border-t pt-2 mt-2">
+                                        <Link href="/cart" onClick={closeMobileMenu}
+                                              className="py-2 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors flex items-center justify-between">
+                                            <span className="flex items-center gap-2">
+                                                <ShoppingCart className="h-4 w-4"/> My Cart
+                                            </span>
+                                            {cartCount > 0 && (
+                                                <span className="bg-orange-500 text-white text-xs font-semibold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                                                    {cartCount > 99 ? "99+" : cartCount}
+                                                </span>
+                                            )}
+                                        </Link>
+                                        <Link href="/favorites" onClick={closeMobileMenu}
+                                              className="py-2 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors flex items-center justify-between">
+                                            <span className="flex items-center gap-2">
+                                                <Heart className="h-4 w-4"/> Favorites
+                                            </span>
+                                            {favoritesCount > 0 && (
+                                                <span className="bg-red-500 text-white text-xs font-semibold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                                                    {favoritesCount > 99 ? "99+" : favoritesCount}
+                                                </span>
+                                            )}
+                                        </Link>
+                                        <Link href="/profile" onClick={closeMobileMenu}
+                                              className="py-2 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors flex items-center gap-2">
+                                            <User className="h-4 w-4"/> Profile
+                                        </Link>
+                                        <button onClick={() => {handleLogout(); closeMobileMenu()}}
+                                                className="w-full py-2 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors flex items-center gap-2 text-left">
+                                            <LogOut className="h-4 w-4"/> Logout
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <Button asChild className="sm:hidden mt-2">
+                                    <Link href="/login">Login</Link>
+                                </Button>
+                            )}
                         </div>
                     </div>
                 )}

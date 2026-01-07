@@ -12,6 +12,7 @@ import {authService} from "@/Service/auth.service"
 import {toast} from "sonner"
 import {Chrome} from "lucide-react"
 import {useRouter} from "next/navigation";
+import {useQueryClient} from "@tanstack/react-query";
 
 const loginSchema = z.object({
     email: z.email({message: "Please enter a valid email address"}),
@@ -21,6 +22,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
+    const queryClient = useQueryClient()
     const router = useRouter()
     const {
         register,
@@ -35,25 +37,29 @@ export default function LoginPage() {
     })
 
     const onSubmit = useCallback(async (data: LoginFormData) => {
-        await authService.login(data)
-            .then((response) => {
-                console.log('response', response?.data?.token)
-                localStorage.setItem("_baby", response?.data?.token)
-                sessionStorage.setItem("_baby", response?.data?.token)
-                toast.success(response.message || "Login successful")
-                router.refresh()
-                router.push("/products")
+        try {
+            const response = await authService.login(data)
+
+            localStorage.setItem("_baby", response?.data?.token)
+
+            toast.success(response.message || "Login successful")
+
+            // ✅ refresh navbar auth state
+            await queryClient.invalidateQueries({
+                queryKey: ["auth", "me"],
             })
-            .catch((error) => {
-                toast.error(error?.message || "Login failed")
-            })
-    }, [router])
+
+            router.push("/products")
+        } catch (error: any) {
+            toast.error(error?.message || "Login failed")
+        }
+    }, [router, queryClient])
+
 
     const handleGoogleLogin = () => {
         window.location.href =
             "http://192.168.100.23:8008/api/v1/auth/google/redirect"
     }
-
 
 
     return (

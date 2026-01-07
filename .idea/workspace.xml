@@ -5,10 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="163987f0-5b21-49d5-9a67-ed416c1eb853" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eslint.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/eslint.config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Service/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Service/auth.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(public)/(auth)/forgot-password/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(public)/(auth)/forgot-password/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(public)/(auth)/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(public)/(auth)/login/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(public)/products/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(public)/products/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/category/CategoryList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/category/CategoryList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/header/HeroSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/header/HeroSection.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/header/Navigation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/header/Navigation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/product/ProductCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/useAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useAuth.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +39,9 @@
   &quot;associatedIndex&quot;: 2
 }</component>
   <component name="ProjectId" id="37vESCsQ57iKwO0gLv970boovrA" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -48,7 +60,7 @@
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/Users/bibek/Desktop/Office Project/BabyCare/baby-market-frontend",
+    "last_opened_file_path": "/Users/bibek/Desktop/Office Project/BabyCare/baby-market-frontend/public",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -62,6 +74,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src/app" />
       <recent name="$PROJECT_DIR$/src" />
@@ -98,7 +111,7 @@
       <updated>1767775142685</updated>
       <workItem from="1767775148144" duration="361000" />
       <workItem from="1767775533809" duration="1308000" />
-      <workItem from="1767778457064" duration="56000" />
+      <workItem from="1767778457064" duration="4018000" />
     </task>
     <servers />
   </component>
