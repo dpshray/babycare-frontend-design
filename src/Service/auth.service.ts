@@ -62,6 +62,41 @@ class AuthService extends HttpService {
         })
     }
 
+    async forgotPassword(data: any) {
+        try {
+            return await this.postRequest({
+                url: '/password-reset',
+                data: data,
+            })
+        }
+        catch (error) {
+            throw error
+        }
+    }
+    async verifyOtp(data: any){
+        try {
+            return await this.postRequest({
+                url: '/verify-password-reset-token',
+                data
+            })
+        }
+        catch (error) {
+            throw error
+        }
+    }
+
+    async resetPassword(data:any){
+
+        try {
+            return await this.postRequest({
+                url: '/handle-password-reset-form',
+                data
+            })
+        }
+        catch (error) {
+            throw error
+        }
+    }
 
 
 }

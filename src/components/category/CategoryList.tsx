@@ -1,10 +1,16 @@
 import Image from "next/image";
 import {useCategories} from "@/hooks/useCategories";
+import {useRouter} from "next/navigation";
+import {useCallback} from "react";
 
 
 export function CategoryList() {
 
     const {categories, isLoading: isLoadingCats} = useCategories()
+    const router = useRouter()
+    const handleClick = useCallback((slug: string) => {
+        router.push(`/products?category=${slug}`)
+    }, [router])
     return (
         <section className="py-12 bg-white">
             <div className="max-w-7xl mx-auto px-4">
@@ -17,6 +23,7 @@ export function CategoryList() {
                         <div
                             key={cat.name}
                             className="flex flex-col items-center gap-2 cursor-pointer focus:outline-none"
+                            onClick={() => handleClick(cat.slug)}
                         >
                             <div
                                 className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-gray-100 hover:border-blue-300 transition-all p-1">
