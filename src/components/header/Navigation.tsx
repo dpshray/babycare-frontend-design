@@ -1,29 +1,35 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import {useCallback, useEffect, useRef, useState} from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { Heart, LogOutIcon, Mail, MapPin, Menu, Phone, Search, ShoppingCart, Smartphone, User, X } from "lucide-react"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { BABY_CARE_ADDRESS, BABY_CARE_APP_STORE_URL, BABY_CARE_EMAIL, BABY_CARE_PHONE, BABY_CARE_PLAY_STORE_URL } from "@/config/app-constant"
-import { cn } from "@/lib/utils"
-import { useAuth } from "@/hooks/useAuth"
-import { authService } from "@/Service/auth.service"
+import {useRouter} from "next/navigation"
+import {Heart, LogOutIcon, Mail, MapPin, Menu, Phone, Search, ShoppingCart, Smartphone, User, X} from "lucide-react"
+import {toast} from "sonner"
+import {Button} from "@/components/ui/button"
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
+import {Input} from "@/components/ui/input"
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card"
+import {
+    BABY_CARE_ADDRESS,
+    BABY_CARE_APP_STORE_URL,
+    BABY_CARE_EMAIL,
+    BABY_CARE_PHONE,
+    BABY_CARE_PLAY_STORE_URL
+} from "@/config/app-constant"
+import {cn} from "@/lib/utils"
+import {useAuth} from "@/hooks/useAuth"
+import {authService} from "@/Service/auth.service"
 
 const navigationLinks = [
-    { href: "/products", label: "Shop" },
-    { href: "/health-center", label: "Health Center" },
-    { href: "/vaccination-schedule", label: "Vaccination Schedule" },
-    { href: "/healthy-tips", label: "Tips" },
+    {href: "/products", label: "Shop"},
+    {href: "/health-center", label: "Health Center"},
+    {href: "/vaccination-schedule", label: "Vaccination Schedule"},
+    {href: "/healthy-tips", label: "Tips"},
 ] as const
 
-export default function NavigationBar({ className }: { className?: string }) {
-    const { user, isLoading } = useAuth()
+export default function NavigationBar({className}: { className?: string }) {
+    const {user, isLoading} = useAuth()
     const router = useRouter()
     const searchInputRef = useRef<HTMLInputElement>(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -33,10 +39,19 @@ export default function NavigationBar({ className }: { className?: string }) {
     const cartCount = user?.cart_item_count ?? 0
     const favoritesCount = user?.favourate_item_count ?? 0
 
-    const toggleMobileMenu = useCallback(() => { setIsMobileMenuOpen(prev => !prev); setIsSearchOpen(false) }, [])
+    const toggleMobileMenu = useCallback(() => {
+        setIsMobileMenuOpen(prev => !prev);
+        setIsSearchOpen(false)
+    }, [])
     const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), [])
-    const toggleSearch = useCallback(() => { setIsSearchOpen(prev => !prev); setIsMobileMenuOpen(false) }, [])
-    const closeSearch = useCallback(() => { setIsSearchOpen(false); setSearchQuery("") }, [])
+    const toggleSearch = useCallback(() => {
+        setIsSearchOpen(prev => !prev);
+        setIsMobileMenuOpen(false)
+    }, [])
+    const closeSearch = useCallback(() => {
+        setIsSearchOpen(false);
+        setSearchQuery("")
+    }, [])
 
     const handleSearch = useCallback((e: React.FormEvent) => {
         e.preventDefault()
@@ -53,25 +68,35 @@ export default function NavigationBar({ className }: { className?: string }) {
         try {
             await authService.logout()
             localStorage.removeItem("_baby")
-            toast.success("Logout successful", { id: toastId })
+            toast.success("Logout successful", {id: toastId})
             router.push("/")
         } catch (error: any) {
-            toast.error(error?.message || "Logout failed", { id: toastId })
+            toast.error(error?.message || "Logout failed", {id: toastId})
         }
     }, [router])
 
     const handleProfile = useCallback(() => router.push("/profile"), [router])
 
-    useEffect(() => { if (isSearchOpen && searchInputRef.current) searchInputRef.current.focus() }, [isSearchOpen])
+    useEffect(() => {
+        if (isSearchOpen && searchInputRef.current) searchInputRef.current.focus()
+    }, [isSearchOpen])
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === "Escape") { if (isSearchOpen) closeSearch(); if (isMobileMenuOpen) closeMobileMenu() }
+            if (e.key === "Escape") {
+                if (isSearchOpen) closeSearch();
+                if (isMobileMenuOpen) closeMobileMenu()
+            }
         }
         document.addEventListener("keydown", handleEscape)
         return () => document.removeEventListener("keydown", handleEscape)
     }, [isSearchOpen, isMobileMenuOpen, closeSearch, closeMobileMenu])
 
-    useEffect(() => { document.body.style.overflow = isMobileMenuOpen ? "hidden" : ""; return () => { document.body.style.overflow = "" } }, [isMobileMenuOpen])
+    useEffect(() => {
+        document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
+        return () => {
+            document.body.style.overflow = ""
+        }
+    }, [isMobileMenuOpen])
 
     const renderBadge = useCallback((count: number, color: "orange" | "red") => {
         if (count === 0) return null
@@ -90,7 +115,7 @@ export default function NavigationBar({ className }: { className?: string }) {
                 <HoverCardTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
                         <Avatar className="h-9 w-9">
-                            <AvatarImage src={user.media || "/placeholder.svg"} alt={user.name} />
+                            <AvatarImage src={user.media || "/placeholder.svg"} alt={user.name}/>
                             <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
                     </Button>
@@ -99,7 +124,7 @@ export default function NavigationBar({ className }: { className?: string }) {
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-3">
                             <Avatar className="h-12 w-12">
-                                <AvatarImage src={user.media || "/placeholder.svg"} alt={user.name} />
+                                <AvatarImage src={user.media || "/placeholder.svg"} alt={user.name}/>
                                 <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             <div>
@@ -108,17 +133,21 @@ export default function NavigationBar({ className }: { className?: string }) {
                             </div>
                         </div>
                         <div className="flex flex-col gap-2 pt-2 border-t">
-                            <Button variant="outline" size="sm" onClick={handleProfile} className="justify-start gap-2 bg-transparent">
-                                <User className="h-4 w-4" /> View Profile
+                            <Button variant="outline" size="sm" onClick={handleProfile}
+                                    className="justify-start gap-2 bg-transparent">
+                                <User className="h-4 w-4"/> View Profile
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => router.push("/cart")} className="justify-start gap-2">
-                                <ShoppingCart className="h-4 w-4" /> My Cart ({cartCount})
+                            <Button variant="outline" size="sm" onClick={() => router.push("/cart")}
+                                    className="justify-start gap-2">
+                                <ShoppingCart className="h-4 w-4"/> My Cart ({cartCount})
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => router.push("/favorites")} className="justify-start gap-2">
-                                <Heart className="h-4 w-4" /> Favorites ({favoritesCount})
+                            <Button variant="outline" size="sm" onClick={() => router.push("/favorites")}
+                                    className="justify-start gap-2">
+                                <Heart className="h-4 w-4"/> Favorites ({favoritesCount})
                             </Button>
-                            <Button variant="destructive" size="sm" onClick={handleLogout} className="justify-start gap-2">
-                                <LogOutIcon className="h-4 w-4" /> Logout
+                            <Button variant="destructive" size="sm" onClick={handleLogout}
+                                    className="justify-start gap-2">
+                                <LogOutIcon className="h-4 w-4"/> Logout
                             </Button>
                         </div>
                     </div>
@@ -132,22 +161,26 @@ export default function NavigationBar({ className }: { className?: string }) {
             <div className="bg-primary text-primary-foreground">
                 <div className="container mx-auto px-4 py-2 hidden md:flex justify-between text-xs">
                     <div className="flex gap-6">
-                        <a href={`tel:${BABY_CARE_PHONE}`} className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                            <Phone className="h-4 w-4" /> {BABY_CARE_PHONE}
+                        <a href={`tel:${BABY_CARE_PHONE}`}
+                           className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+                            <Phone className="h-4 w-4"/> {BABY_CARE_PHONE}
                         </a>
-                        <a href={`mailto:${BABY_CARE_EMAIL}`} className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                            <Mail className="h-4 w-4" /> {BABY_CARE_EMAIL}
+                        <a href={`mailto:${BABY_CARE_EMAIL}`}
+                           className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+                            <Mail className="h-4 w-4"/> {BABY_CARE_EMAIL}
                         </a>
                         <span className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" /> {BABY_CARE_ADDRESS}
+                            <MapPin className="h-4 w-4"/> {BABY_CARE_ADDRESS}
                         </span>
                     </div>
                     <div className="flex gap-4">
-                        <a href={BABY_CARE_PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                            <Smartphone className="h-4 w-4" /> Play Store
+                        <a href={BABY_CARE_PLAY_STORE_URL} target="_blank" rel="noopener noreferrer"
+                           className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+                            <Smartphone className="h-4 w-4"/> Play Store
                         </a>
-                        <a href={BABY_CARE_APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-                            <Smartphone className="h-4 w-4" /> App Store
+                        <a href={BABY_CARE_APP_STORE_URL} target="_blank" rel="noopener noreferrer"
+                           className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+                            <Smartphone className="h-4 w-4"/> App Store
                         </a>
                     </div>
                 </div>
@@ -156,59 +189,64 @@ export default function NavigationBar({ className }: { className?: string }) {
             <nav className="border-b">
                 <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-                        <Image src="/logo.png" alt="BabyCare Logo" width={48} height={48} />
-                        <div>
-                            <div className="font-bold text-primary">BABYCARE</div>
-                            <div className="text-[10px] text-muted-foreground">Global Care</div>
-                        </div>
+                        <Image src="/logo.png"
+                               alt="BabyCare Logo"
+
+                               width={100} height={100}/>
                     </Link>
 
                     <div className="hidden lg:flex gap-6">
                         {navigationLinks.map(link => (
-                            <Link key={link.href} href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                            <Link key={link.href} href={link.href}
+                                  className="text-sm text-muted-foreground hover:text-primary transition-colors">
                                 {link.label}
                             </Link>
                         ))}
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={toggleSearch} aria-label={isSearchOpen ? "Close search" : "Open search"}>
-                            {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                        <Button variant="ghost" size="icon" onClick={toggleSearch}
+                                aria-label={isSearchOpen ? "Close search" : "Open search"}>
+                            {isSearchOpen ? <X className="h-5 w-5"/> : <Search className="h-5 w-5"/>}
                         </Button>
 
                         {user ? (
                             <>
                                 <Link href="/cart" className="relative">
                                     <Button variant="ghost" size="icon" aria-label="Shopping cart">
-                                        <ShoppingCart className="h-5 w-5" />
+                                        <ShoppingCart className="h-5 w-5"/>
                                     </Button>
                                     {renderBadge(cartCount, "orange")}
                                 </Link>
                                 <Link href="/favorites" className="relative">
                                     <Button variant="ghost" size="icon" aria-label="Favorites">
-                                        <Heart className="h-5 w-5" />
+                                        <Heart className="h-5 w-5"/>
                                     </Button>
                                     {renderBadge(favoritesCount, "red")}
                                 </Link>
                                 {renderUserAvatar()}
                             </>
                         ) : isLoading ? (
-                            <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
+                            <div className="h-9 w-9 rounded-full bg-muted animate-pulse"/>
                         ) : (
                             <Button asChild>
                                 <Link href="/login">Login</Link>
                             </Button>
                         )}
 
-                        <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsMobileMenuOpen(prev => !prev)} aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}>
-                            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                        <Button variant="ghost" size="icon" className="lg:hidden"
+                                onClick={() => setIsMobileMenuOpen(prev => !prev)}
+                                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}>
+                            {isMobileMenuOpen ? <X className="h-5 w-5"/> : <Menu className="h-5 w-5"/>}
                         </Button>
                     </div>
                 </div>
 
                 {isSearchOpen && (
                     <form onSubmit={handleSearch} className="container mx-auto px-4 py-2 lg:hidden">
-                        <Input ref={searchInputRef} type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search products..." aria-label="Search products" />
+                        <Input ref={searchInputRef} type="search" value={searchQuery}
+                               onChange={e => setSearchQuery(e.target.value)} placeholder="Search products..."
+                               aria-label="Search products"/>
                     </form>
                 )}
 
@@ -216,7 +254,8 @@ export default function NavigationBar({ className }: { className?: string }) {
                     <div className="lg:hidden border-t bg-background">
                         <div className="flex flex-col p-4 gap-2">
                             {navigationLinks.map(link => (
-                                <Link key={link.href} href={link.href} onClick={closeMobileMenu} className="py-2 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors">
+                                <Link key={link.href} href={link.href} onClick={closeMobileMenu}
+                                      className="py-2 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors">
                                     {link.label}
                                 </Link>
                             ))}
