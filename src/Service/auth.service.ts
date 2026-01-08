@@ -57,7 +57,7 @@ class AuthService extends HttpService {
     }
     googleLogin = async (data: { token: string }) => {
         return this.postRequest({
-            url: "/api/v1/auth/google",
+            url: "/login/google",
             data,
         })
     }

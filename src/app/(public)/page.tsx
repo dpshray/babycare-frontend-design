@@ -5,10 +5,11 @@ import ProductCard from "@/components/product/ProductCard";
 import {TestimonialSection} from "@/components/Slider/Testimonial";
 import {AppPromo} from "@/components/Slider/App-promo";
 import {useProducts} from "@/hooks/useProduct";
+import {FeaturesSection} from "@/components/header/features-section";
 
 export default function Page() {
     const {products, isLoading, totalPages} = useProducts({
-        page:1,
+        page: 1,
         per_page: 8,
 
     })
@@ -30,6 +31,7 @@ export default function Page() {
                 </div>
             </section>
             <TestimonialSection/>
+            <FeaturesSection/>
             <AppPromo/>
         </main>
     )

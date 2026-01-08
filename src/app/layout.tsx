@@ -1,9 +1,8 @@
-import type { Metadata } from "next";
-import { Mulish, Open_Sans } from "next/font/google";
+import type {Metadata} from "next";
+import {Mulish, Open_Sans} from "next/font/google";
 import "./globals.css";
 import React from "react";
-import ReactQueryProvider from "@/Provider/ReactQueryProvider";
-import { Toaster } from "sonner";
+import RootProviders from "@/Provider/Providers";
 
 const openSans = Open_Sans({
     subsets: ["latin"],
@@ -21,7 +20,7 @@ export const metadata: Metadata = {
     title: "BabyCare MarketPlace",
     description: "Your trusted marketplace for baby products and parenting essentials.",
     keywords: "baby, babycare, marketplace, parenting, products, wellness",
-    authors: [{ name: "BabyCare Team" }],
+    authors: [{name: "BabyCare Team"}],
     creator: "BabyCare Team",
     openGraph: {
         title: "BabyCare MarketPlace",
@@ -61,10 +60,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body className={`${openSans.variable} ${mulish.variable} antialiased`}>
-        <Toaster richColors position="top-right" duration={5000} />
-        <ReactQueryProvider>
-            {children}
-        </ReactQueryProvider>
+        <RootProviders>{children}</RootProviders>
         </body>
         </html>
     );
