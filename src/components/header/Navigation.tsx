@@ -4,7 +4,7 @@ import {useCallback, useEffect, useRef, useState} from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {usePathname, useRouter} from "next/navigation"
-import {Heart, LogOut, Mail, MapPin, Menu, Phone, Search, ShoppingCart, Smartphone, User, X} from "lucide-react"
+import {Baby, Heart, LogOut, Mail, MapPin, Menu, Phone, Search, ShoppingCart, Smartphone, User, X} from "lucide-react"
 import {toast} from "sonner"
 import {Button} from "@/components/ui/button"
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
@@ -146,6 +146,10 @@ export default function NavigationBar({className}: { className?: string }) {
                                     className="justify-start gap-2 bg-transparent">
                                 <User className="h-4 w-4"/> View Profile
                             </Button>
+                            <Button variant="outline" size="sm" onClick={() => router.push("/baby")}
+                                    className="justify-start gap-2">
+                                <Baby className="h-4 w-4"/> Baby
+                            </Button>
                             <Button variant="outline" size="sm" onClick={() => router.push("/cart")}
                                     className="justify-start gap-2">
                                 <ShoppingCart className="h-4 w-4"/> My Cart ({cartCount})
@@ -158,6 +162,7 @@ export default function NavigationBar({className}: { className?: string }) {
                                     className="justify-start gap-2">
                                 <LogOut className="h-4 w-4"/> Logout
                             </Button>
+
                         </div>
                     </div>
                 </HoverCardContent>
