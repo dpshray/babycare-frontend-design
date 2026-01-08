@@ -17,10 +17,13 @@ const BABY_CARE_APP_DESCRIPTION = "BabyCare is a platform for parents to find th
 const BABY_CARE_APP_KEYWORDS = "baby care, baby products, baby services, baby health, baby nutrition, baby health care, baby health tips, baby health advice, baby health care, baby health care, baby health care";
 
 
-const BABY_CARE_FACEBOOK_URL='https://www.facebook.com/babycare'
-const BABY_CARE_INSTAGRAM_URL='https://www.instagram.com/babycare'
-const BABY_CARE_TWITTER_URL='https://twitter.com/babycare'
-const BABY_CARE_LINKEDIN_URL='https://www.linkedin.com/company/babycare'
+const BABY_CARE_FACEBOOK_URL = 'https://www.facebook.com/babycare'
+const BABY_CARE_INSTAGRAM_URL = 'https://www.instagram.com/babycare'
+const BABY_CARE_TWITTER_URL = 'https://twitter.com/babycare'
+const BABY_CARE_LINKEDIN_URL = 'https://www.linkedin.com/company/babycare'
+
+
+const GOOGLE_CLIENT_ID = "465834634658-ce5bl1kjoaehpm82ipeb2kqg7mg910ot.apps.googleusercontent.com"
 
 export
 {
@@ -39,5 +42,6 @@ export
     BABY_CARE_FACEBOOK_URL,
     BABY_CARE_INSTAGRAM_URL,
     BABY_CARE_TWITTER_URL,
-    BABY_CARE_LINKEDIN_URL
+    BABY_CARE_LINKEDIN_URL,
+    GOOGLE_CLIENT_ID
 }

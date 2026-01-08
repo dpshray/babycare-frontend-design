@@ -15,6 +15,10 @@ import * as z from "zod"
 import {authService} from "@/Service/auth.service"
 import {toast} from "sonner"
 import {Chrome} from "lucide-react"
+import {useGoogleLogin} from "@react-oauth/google";
+import Image from "next/image";
+import {useRouter} from "next/navigation";
+import {useQueryClient} from "@tanstack/react-query";
 
 const registerSchema = z
     .object({
@@ -44,6 +48,8 @@ type RegisterFormData = z.infer<typeof registerSchema>
 
 export default function RegisterPage() {
     const [previewImage, setPreviewImage] = useState<string | null>(null)
+    const router=useRouter()
+    const queryClient = useQueryClient();
 
     const {
         register,
@@ -92,6 +98,28 @@ export default function RegisterPage() {
             reader.readAsDataURL(file)
         }
     }, [])
+
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            console.log("Google Response:", tokenResponse);
+            try {
+
+                const response = await authService.googleLogin({
+                    token: tokenResponse.access_token,
+                });
+                localStorage.setItem("_baby", response.data.token);
+                toast.success("Google login successful");
+                await queryClient.invalidateQueries({queryKey: ["auth", "me"]});
+                router.push("/products");
+            } catch (error: any) {
+
+                toast.error(error?.message || "Google login failed");
+            }
+        },
+        onError: (errorResponse) => {
+            console.log('Google Login Response', errorResponse)
+        },
+    });
 
     return (
         <div className="h-fit grid lg:grid-cols-2 items-stretch container mx-auto my-12">
@@ -232,9 +260,11 @@ export default function RegisterPage() {
 
                     <Button
                         type="button"
-                        className="w-full h-11 rounded-lg border border-slate-300 bg-white text-slate-900 font-medium hover:bg-slate-50 transition-colors flex items-center justify-center gap-3"
+                        onClick={() => googleLogin()}
+                        className="w-full h-11 rounded-lg border border-slate-300 bg-white text-slate-900 flex items-center justify-center gap-3 hover:text-white cursor-pointer"
                     >
-                        <Chrome size={18} className="text-blue-600"/>
+                        <Image src={'/google.svg'} alt={'Google Icon'} width={20} height={20}
+                               className={'w-6 h-6'}/>
                         Continue with Google
                     </Button>
 
