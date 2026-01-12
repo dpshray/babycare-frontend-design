@@ -113,6 +113,7 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
     }, [isSubmitting, onCloseAction]);
 
     const today = new Date().toISOString().split("T")[0];
+    const isEditMode = mode === "edit";
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -126,7 +127,7 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
                 <div className="space-y-4 sm:space-y-6 mt-2 sm:mt-4">
                     <div className="space-y-2">
                         <Label htmlFor="name" className="text-sm font-medium">
-                            Name <span className="text-red-500">*</span>
+                            Name {!isEditMode && <span className="text-red-500">*</span>}
                         </Label>
                         <Input
                             id="name"
@@ -135,7 +136,7 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
                             aria-invalid={errors.name ? "true" : "false"}
                             aria-describedby={errors.name ? "name-error" : undefined}
                             {...register("name", {
-                                required: "Name is required",
+                                required: isEditMode ? false : "Name is required",
                                 minLength: { value: 2, message: "Name must be at least 2 characters" },
                                 maxLength: { value: 50, message: "Name must not exceed 50 characters" },
                             })}
@@ -149,7 +150,7 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
 
                     <div className="space-y-2">
                         <Label htmlFor="dob" className="text-sm font-medium">
-                            Date of Birth <span className="text-red-500">*</span>
+                            Date of Birth {!isEditMode && <span className="text-red-500">*</span>}
                         </Label>
                         <Input
                             id="dob"
@@ -159,8 +160,9 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
                             aria-invalid={errors.dob ? "true" : "false"}
                             aria-describedby={errors.dob ? "dob-error" : undefined}
                             {...register("dob", {
-                                required: "Date of birth is required",
+                                required: isEditMode ? false : "Date of birth is required",
                                 validate: (value) => {
+                                    if (!value) return true;
                                     const selectedDate = new Date(value);
                                     const currentDate = new Date();
                                     return selectedDate <= currentDate || "Date cannot be in the future";
@@ -176,12 +178,12 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
 
                     <div className="space-y-3">
                         <Label className="text-sm font-medium">
-                            Gender <span className="text-red-500">*</span>
+                            Gender {!isEditMode && <span className="text-red-500">*</span>}
                         </Label>
                         <Controller
                             name="gender"
                             control={control}
-                            rules={{ required: "Gender is required" }}
+                            rules={{ required: isEditMode ? false : "Gender is required" }}
                             render={({ field }) => (
                                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                                     <label className="flex items-center space-x-3 cursor-pointer">

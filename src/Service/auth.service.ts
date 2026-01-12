@@ -55,6 +55,7 @@ class AuthService extends HttpService {
             throw error
         }
     }
+    
     googleLogin = async (data: { token: string }) => {
         return this.postRequest({
             url: "/login/google",
@@ -94,6 +95,18 @@ class AuthService extends HttpService {
             })
         }
         catch (error) {
+            throw error
+        }
+    }
+
+    async vendorRegister(data: any) {
+        try {
+            return await this.postRequest({
+                url: '/vendor/registration',
+                data: data,
+            })
+        } catch (error) {
+            console.error('error in register', error)
             throw error
         }
     }

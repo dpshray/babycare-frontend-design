@@ -1,9 +1,9 @@
 'use client'
 
-import {useParams} from 'next/navigation'
+import {useParams, useRouter} from 'next/navigation'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {useCallback, useEffect, useMemo, useState} from 'react'
-import {Clock, Heart, Shield, ShoppingCart, Star, Truck} from 'lucide-react'
+import {useCallback, useMemo, useState, useTransition} from 'react'
+import {Clock, Heart, Shield, ShoppingCart, Star, Store, Truck} from 'lucide-react'
 import Image from 'next/image'
 import productService from '@/Service/product.service'
 import ProductReview from '@/components/product/ProductReview'
@@ -11,8 +11,10 @@ import {Button} from '@/components/ui/button'
 import {Badge} from '@/components/ui/badge'
 import {Skeleton} from '@/components/ui/skeleton'
 import {toast} from 'sonner'
-import {cn} from '@/lib/utils'
+import {cn, formatPrice} from '@/lib/utils'
 import type {AxiosError} from 'axios'
+import cartService from '@/Service/cart.service'
+import { useAuth } from '@/hooks/useAuth'
 
 export interface Category {
     name: string
@@ -25,6 +27,7 @@ export interface Tag {
 }
 
 export interface ProductData {
+    product_uuid: string
     name: string
     slug: string
     price: number
@@ -43,6 +46,7 @@ export interface ProductData {
     gallery_images: string[]
     liked: boolean
     stock: number
+    store_name: string
 }
 
 export interface ProductDetailsResponse {
@@ -107,7 +111,10 @@ const getErrorMessage = (error: unknown): string => {
 
 export default function ProductDetail() {
     const params = useParams()
+    const router = useRouter()
+    const { user, isAuthenticated} = useAuth();
     const queryClient = useQueryClient()
+    const [isPending, startTransition] = useTransition()
     const slug = typeof params.slug === 'string' ? params.slug : undefined
 
     const [selectedImage, setSelectedImage] = useState(0)
@@ -123,11 +130,16 @@ export default function ProductDetail() {
 
     const product = data?.data
 
-    useEffect(() => {
-        if (product) {
-            setQuantity(MIN_QUANTITY)
-        }
-    }, [product])
+    const {mutate: addToCart, isPending: isCartPending} = useMutation({
+        mutationFn: (payload: { slug: string; quantity: number }) =>
+            cartService.addToCart(payload).then((res) => {
+                toast.success(res.message || "Product added to cart");
+            }),
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ["cart"]}),
+        onError: (error) => {
+            toast.error(error?.message || "Please try again");
+        },
+    });
 
     const {mutate: toggleFavorite, isPending: isFavoritePending} = useMutation<
         FavoriteResponse,
@@ -180,8 +192,37 @@ export default function ProductDetail() {
     }, [])
 
     const handleAddToCart = useCallback(() => {
-        toast.success(`Added ${quantity} item(s) to cart`)
-    }, [quantity])
+        if (slug && product && quantity > 0 && quantity <= product.stock) {
+            addToCart({slug, quantity});
+        }
+    }, [addToCart, slug, quantity, product]);
+
+    const handleCheckout = useCallback(() => {
+        if(!user && !isAuthenticated){
+            toast.error("Please login to checkout")
+            return
+        }
+        if (!product) {
+            toast.error("Product not available")
+            return
+        }
+
+        startTransition(() => {
+            const checkoutData = {
+                uuid: product.product_uuid,
+                quantity: quantity
+            }
+
+            queryClient.setQueryData(["checkout-items"], [checkoutData])
+
+            const searchParams = new URLSearchParams()
+            searchParams.append("items", product.product_uuid)
+            searchParams.append("quantity", quantity.toString())
+
+            router.push(`/checkout?${searchParams.toString()}`)
+            // router.push('/checkout')
+        })
+    }, [product, quantity, queryClient, router, user, isAuthenticated])
 
     if (isLoading) return <LoadingSkeleton/>
     if (error || !product) return <ErrorState/>
@@ -269,10 +310,17 @@ export default function ProductDetail() {
                                     <span className="text-muted-foreground">|</span>
                                     {product.categories.map((cat, idx) => (
                                         <span key={cat.slug} className="text-muted-foreground">
-                      {cat.name}
+                                            {cat.name}
                                             {idx < product.categories.length - 1 && ', '}
-                    </span>
+                                        </span>
                                     ))}
+                                </div>
+
+                                <div className="flex items-center gap-2 text-xs sm:text-sm">
+                                    <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                                    <span className="font-medium text-muted-foreground">
+                                        Sold by: <span className="text-foreground">{product.store_name}</span>
+                                    </span>
                                 </div>
 
                                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
@@ -303,17 +351,17 @@ export default function ProductDetail() {
                             </div>
 
                             <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
-                <span className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                  ${product.price.toFixed(2)}
-                </span>
+                                <span className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                                    {formatPrice(product.price)}
+                                </span>
                                 {product.previous_price > product.price && (
                                     <>
-                    <span className="text-lg sm:text-xl line-through text-muted-foreground">
-                      ${product.previous_price.toFixed(2)}
-                    </span>
+                                        <span className="text-lg sm:text-xl line-through text-muted-foreground">
+                                            ${product.previous_price.toFixed(2)}
+                                        </span>
                                         <Badge variant="secondary"
                                                className="bg-green-100 text-green-700 text-xs sm:text-sm">
-                                            Save ${discountAmount.toFixed(2)}
+                                            Save {formatPrice(discountAmount)}
                                         </Badge>
                                     </>
                                 )}
@@ -324,8 +372,8 @@ export default function ProductDetail() {
                                     <div>
                                         <span className="text-muted-foreground">Age Range: </span>
                                         <span className="font-semibold">
-                      {product.age_group_year_from}-{product.age_group_year_to} years
-                    </span>
+                                            {product.age_group_year_from}-{product.age_group_year_to} years
+                                        </span>
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">Size: </span>
@@ -344,8 +392,8 @@ export default function ProductDetail() {
                                                 : "text-red-600"
                                         )}
                                     >
-                    {isInStock ? `${product.stock} available` : 'Out of stock'}
-                  </span>
+                                        {isInStock ? `${product.stock} available` : 'Out of stock'}
+                                    </span>
                                 </div>
                             </div>
 
@@ -367,10 +415,9 @@ export default function ProductDetail() {
                                 </div>
                             )}
 
-                            <div
-                                className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 sm:gap-3 pt-2">
+                            <div className="flex flex-col gap-3 pt-2">
                                 <div
-                                    className="flex items-center border rounded-lg overflow-hidden"
+                                    className="flex items-center border rounded-lg overflow-hidden w-fit"
                                     role="group"
                                     aria-label="Quantity selector"
                                 >
@@ -392,8 +439,8 @@ export default function ProductDetail() {
                                         aria-live="polite"
                                         aria-label={`Quantity: ${quantity}`}
                                     >
-                    {quantity}
-                  </span>
+                                        {quantity}
+                                    </span>
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -409,18 +456,33 @@ export default function ProductDetail() {
                                     </Button>
                                 </div>
 
-                                <Button
-                                    className={cn(
-                                        "flex-1 h-9 sm:h-10 lg:h-11 text-sm sm:text-base",
-                                        !isInStock && "opacity-60"
-                                    )}
-                                    onClick={handleAddToCart}
-                                    disabled={!isInStock}
-                                    aria-label={isInStock ? 'Add to cart' : 'Out of stock'}
-                                >
-                                    <ShoppingCart className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4"/>
-                                    {isInStock ? 'Add to Cart' : 'Out of Stock'}
-                                </Button>
+                                <div className="flex flex-col xs:flex-row gap-2 sm:gap-3">
+                                    <Button
+                                        className={cn(
+                                            "flex-1 h-9 sm:h-10 lg:h-11 text-sm sm:text-base",
+                                            !isInStock && "opacity-60"
+                                        )}
+                                        onClick={handleCheckout}
+                                        disabled={!isInStock || isPending}
+                                        aria-label={isInStock ? 'Checkout now' : 'Out of stock'}
+                                    >
+                                        <ShoppingCart className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4"/>
+                                        {isPending ? 'Processing...' : 'Checkout'}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "flex-1 h-9 sm:h-10 lg:h-11 text-sm sm:text-base",
+                                            !isInStock && "opacity-60"
+                                        )}
+                                        onClick={handleAddToCart}
+                                        disabled={!isInStock || isCartPending}
+                                        aria-label={isInStock ? 'Add to cart' : 'Out of stock'}
+                                    >
+                                        <ShoppingCart className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4"/>
+                                        {isInStock ? 'Add to Cart' : 'Out of Stock'}
+                                    </Button>
+                                </div>
                             </div>
 
                             <div

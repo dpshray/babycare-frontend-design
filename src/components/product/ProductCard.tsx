@@ -8,7 +8,7 @@ import {useMutation, useQueryClient} from "@tanstack/react-query";
 import cartService from "@/Service/cart.service";
 import {useRouter} from "next/navigation";
 import {Input} from "@/components/ui/input";
-import {Heart, Minus, Plus, ShoppingCart} from "lucide-react";
+import {Heart, Minus, Plus, ShoppingCart, Store} from "lucide-react";
 import {toast} from "sonner";
 import productService from "@/Service/product.service";
 import RatingDisplay from "@/components/Rating";
@@ -24,6 +24,7 @@ interface Product {
     discount_percent: number;
     liked: boolean;
     stock: number;
+    store_name: string;
 }
 
 interface ProductCardProps {
@@ -32,7 +33,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(({product, className}) => {
-    const {name, price, previous_price, feature_image, slug, stock, liked, rating} = product;
+    const {name, price, previous_price, feature_image, slug, stock, liked, rating, store_name} = product;
     const queryClient = useQueryClient();
     const router = useRouter();
     const [quantity, setQuantity] = useState(1);
@@ -118,6 +119,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({product, className}
                 >
                     {name}
                 </h3>
+
+                {store_name && (
+                    <div className="flex items-center gap-1.5 mb-2">
+                        <Store className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-gray-500 flex-shrink-0" />
+                        <span className="text-xs text-gray-600 truncate">
+                            {store_name}
+                        </span>
+                    </div>
+                )}
 
                 <RatingDisplay rating={rating} maxRating={5} size="sm"/>
 

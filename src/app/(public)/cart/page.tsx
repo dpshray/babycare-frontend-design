@@ -14,6 +14,7 @@ import {formatPrice} from "@/lib/utils"
 import {toast} from "sonner"
 import {QUERY_STALE_TIME} from "@/config/app-constant"
 import {CartSummaryCard} from "@/app/(public)/cart/CartSummaryCard"
+import { useAuth } from "@/hooks/useAuth"
 
 export interface CartItem {
     item_uuid: string
@@ -44,8 +45,8 @@ export default function CartPage() {
             }
             return response
         },
-        staleTime: QUERY_STALE_TIME,
         refetchOnWindowFocus: true,
+        refetchOnMount:true,
         retry: 2,
     })
 

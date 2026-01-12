@@ -6,6 +6,7 @@ import {TestimonialSection} from "@/components/Slider/Testimonial";
 import {AppPromo} from "@/components/Slider/App-promo";
 import {useProducts} from "@/hooks/useProduct";
 import {FeaturesSection} from "@/components/header/features-section";
+import { VendorCTASection } from "@/components/header/VendorCTASection";
 
 export default function Page() {
     const {products, isLoading, totalPages} = useProducts({
@@ -15,7 +16,6 @@ export default function Page() {
     })
     return (
         <main className="min-h-screen">
-
             <HeroSection/>
             <CategoryList/>
             <section className="py-16 bg-[#fcfcfc]">
@@ -33,6 +33,7 @@ export default function Page() {
             <TestimonialSection/>
             <FeaturesSection/>
             <AppPromo/>
+            <VendorCTASection />
         </main>
     )
 }

@@ -23,7 +23,7 @@ const BABY_CARE_TWITTER_URL = 'https://twitter.com/babycare'
 const BABY_CARE_LINKEDIN_URL = 'https://www.linkedin.com/company/babycare'
 
 
-const GOOGLE_CLIENT_ID = "465834634658-ce5bl1kjoaehpm82ipeb2kqg7mg910ot.apps.googleusercontent.com"
+const GOOGLE_CLIENT_ID = "1093076365245-ta2sb81v6qj6ruocdilnr8vpkm2k741g.apps.googleusercontent.com"
 
 export
 {
