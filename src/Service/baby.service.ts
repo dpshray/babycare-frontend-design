@@ -102,8 +102,16 @@ class BabyService extends HttpService {
 
     }
 
-    async updateVaccine(id: number, status: string) {
-
+    async updateBabyVaccineDate(vaccineId: number) {
+        try {
+            return await this.patchRequest({
+                url: `/update-vaccinated-date/${vaccineId}`,
+                data: { vaccine_id: vaccineId },
+                config: { auth: true },
+            });
+        } catch (error) {
+            throw error;
+        }
     }
 
 

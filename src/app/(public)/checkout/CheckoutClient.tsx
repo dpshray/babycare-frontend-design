@@ -73,7 +73,7 @@ export default function CheckoutPage() {
         const paramItems = searchParams.getAll("items")
         if (paramItems.length === 0) {
             toast.error("No items selected for checkout")
-            router.push("/cart")
+            router.back()
             return
         }
         setCheckoutItemUuids(paramItems)

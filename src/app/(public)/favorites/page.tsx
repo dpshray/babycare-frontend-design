@@ -6,7 +6,7 @@ import {Heart, ShoppingCart, Star} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {toast} from 'sonner'
-import {cn} from '@/lib/utils'
+import {cn, formatPrice} from '@/lib/utils'
 import productService from '@/Service/product.service'
 import CustomPagination from '@/components/Custom-Pagination'
 import {Button} from '@/components/ui/button'
@@ -279,7 +279,7 @@ export default function FavoritesPage() {
                                             <div className="space-y-1">
                                                 <div className="flex items-baseline gap-2 flex-wrap">
                           <span className="text-lg sm:text-xl font-bold">
-                            ${product.price.toFixed(2)}
+                              {formatPrice(product.price)}
                           </span>
                                                     {hasDiscount && (
                                                         <span className="text-sm line-through text-muted-foreground">

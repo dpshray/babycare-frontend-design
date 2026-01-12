@@ -1,13 +1,20 @@
-import React, {useMemo} from "react";
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,} from "@/components/ui/dialog";
-import {Badge} from "@/components/ui/badge";
-import {Alert, AlertDescription} from "@/components/ui/alert";
-import {Switch} from "@/components/ui/switch";
-import {Label} from "@/components/ui/label";
-import {AlertCircle, Calendar, Loader2, Shield, Syringe} from "lucide-react";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import React, { useMemo } from "react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, Calendar, Loader2, Shield, Syringe } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import babyService from "@/Service/baby.service";
-import {format} from "date-fns";
+import { format } from "date-fns";
+import {formatDate} from "@/lib/utils";
 
 interface Vaccine {
     id: number;
@@ -34,42 +41,34 @@ const VaccineFormModal: React.FC<VaccineModalProps> = ({
                                                        }) => {
     const queryClient = useQueryClient();
 
-    const {data , isLoading} = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ["baby-vaccines", babyId],
-        queryFn: async () => {
-            return  await babyService.getVaccines(babyId);
-
-        },
+        queryFn: () => babyService.getVaccines(babyId),
         enabled: open,
     });
+    console.log('getVaccines',data)
+
     const vaccines: Vaccine[] = useMemo(() => data?.data ?? [], [data]);
 
-
     const updateVaccineStatus = useMutation({
-        mutationFn: ({id, status}: { id: number; status: string }) =>
-            babyService.updateVaccine(id, status),
+        mutationFn: async (id: number) => {
+            console.log('Vaccine Id',id)
+            await babyService.updateBabyVaccineDate(id)
+        },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ["baby-vaccines", babyId]});
+            queryClient.invalidateQueries({ queryKey: ["baby-vaccines", babyId] });
         },
     });
 
-    const formatDateDisplay = (dateString: string): string => {
-        try {
-            return format(new Date(dateString), "MMM dd, yyyy");
-        } catch {
-            return dateString;
-        }
-    };
 
-    const getStatusColor = (status?: string): string => {
-        return status === "COMPLETED"
+
+    const getStatusColor = (status?: string): string =>
+        status === "COMPLETED"
             ? "bg-green-100 text-green-800 border-green-200"
             : "bg-gray-100 text-gray-800 border-gray-200";
-    };
 
-    const handleStatusToggle = (vaccineId: number, currentStatus?: string) => {
-        const newStatus = currentStatus === "COMPLETED" ? "INCOMPLETE" : "COMPLETED";
-        updateVaccineStatus.mutate({id: vaccineId, status: newStatus});
+    const handleStatusToggle = (vaccineId: number) => {
+        updateVaccineStatus.mutate(vaccineId);
     };
 
     return (
@@ -77,7 +76,7 @@ const VaccineFormModal: React.FC<VaccineModalProps> = ({
             <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-2xl flex items-center gap-2">
-                        <Syringe className="h-6 w-6 text-blue-600"/>
+                        <Syringe className="h-6 w-6 text-blue-600" />
                         Vaccination Schedule
                     </DialogTitle>
                     <DialogDescription>
@@ -90,23 +89,23 @@ const VaccineFormModal: React.FC<VaccineModalProps> = ({
                 <div className="mt-6 space-y-3">
                     {isLoading ? (
                         <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-6 w-6 animate-spin text-blue-600"/>
+                            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
                         </div>
                     ) : vaccines.length === 0 ? (
                         <Alert>
-                            <AlertCircle className="h-4 w-4"/>
+                            <AlertCircle className="h-4 w-4" />
                             <AlertDescription>
                                 No vaccination records found for this baby.
                             </AlertDescription>
                         </Alert>
                     ) : (
-                        vaccines.map((vaccine: Vaccine,index:number) => (
+                        vaccines.map((vaccine) => (
                             <VaccineItem
-                                key={index}
+                                key={vaccine.id}
                                 vaccine={vaccine}
                                 onStatusToggle={handleStatusToggle}
                                 isUpdating={updateVaccineStatus.isPending}
-                                formatDateDisplay={formatDateDisplay}
+                                formatDateDisplay={formatDate}
                                 getStatusColor={getStatusColor}
                             />
                         ))
@@ -119,7 +118,7 @@ const VaccineFormModal: React.FC<VaccineModalProps> = ({
 
 interface VaccineItemProps {
     vaccine: Vaccine;
-    onStatusToggle: (id: number, status?: string) => void;
+    onStatusToggle: (id: number) => void;
     isUpdating: boolean;
     formatDateDisplay: (date: string) => string;
     getStatusColor: (status?: string) => string;
@@ -144,28 +143,28 @@ const VaccineItem: React.FC<VaccineItemProps> = ({
                         </h4>
                         <div className="space-y-2 text-sm text-gray-600">
                             <div className="flex items-center gap-2">
-                                <Calendar className="h-3.5 w-3.5"/>
+                                <Calendar className="h-3.5 w-3.5" />
                                 <span className="font-medium">Age: {vaccine.age}</span>
                             </div>
                             {vaccine.actual_date && (
                                 <div className="flex items-center gap-2 text-green-600">
-                                    <Calendar className="h-3.5 w-3.5"/>
+                                    <Calendar className="h-3.5 w-3.5" />
                                     <span>
-                                        Given: {formatDateDisplay(vaccine.actual_date)}
-                                    </span>
+                    Given: {formatDateDisplay(vaccine.actual_date)}
+                  </span>
                                 </div>
                             )}
                             {vaccine.diseases_covered.length > 0 && (
                                 <div className="flex items-start gap-2 text-gray-700 mt-2">
-                                    <Shield className="h-3.5 w-3.5 mt-0.5 flex-shrink-0"/>
+                                    <Shield className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                                     <div className="flex flex-wrap gap-1">
                                         {vaccine.diseases_covered.map((disease, index) => (
                                             <span
                                                 key={index}
                                                 className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded"
                                             >
-                                                {disease}
-                                            </span>
+                        {disease}
+                      </span>
                                         ))}
                                     </div>
                                 </div>
@@ -192,9 +191,7 @@ const VaccineItem: React.FC<VaccineItemProps> = ({
                     <Switch
                         id={`vaccine-${vaccine.id}`}
                         checked={isCompleted}
-                        onCheckedChange={() =>
-                            onStatusToggle(vaccine.id, vaccine.status)
-                        }
+                        onCheckedChange={() => onStatusToggle(vaccine.id)}
                         disabled={isUpdating}
                     />
                 </div>
