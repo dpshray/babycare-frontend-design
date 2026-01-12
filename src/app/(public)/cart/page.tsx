@@ -44,8 +44,8 @@ export default function CartPage() {
             }
             return response
         },
-        staleTime: QUERY_STALE_TIME,
         refetchOnWindowFocus: true,
+        refetchOnMount:true,
         retry: 2,
     })
 
