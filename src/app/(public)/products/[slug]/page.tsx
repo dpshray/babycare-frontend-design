@@ -2,8 +2,8 @@
 
 import {useParams, useRouter} from 'next/navigation'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {useCallback, useEffect, useMemo, useState, useTransition} from 'react'
-import {Clock, Heart, Shield, ShoppingCart, Star, Truck} from 'lucide-react'
+import {useCallback, useMemo, useState, useTransition} from 'react'
+import {Clock, Heart, Shield, ShoppingCart, Star, Store, Truck} from 'lucide-react'
 import Image from 'next/image'
 import productService from '@/Service/product.service'
 import ProductReview from '@/components/product/ProductReview'
@@ -13,6 +13,8 @@ import {Skeleton} from '@/components/ui/skeleton'
 import {toast} from 'sonner'
 import {cn, formatPrice} from '@/lib/utils'
 import type {AxiosError} from 'axios'
+import cartService from '@/Service/cart.service'
+import { useAuth } from '@/hooks/useAuth'
 
 export interface Category {
     name: string
@@ -25,7 +27,7 @@ export interface Tag {
 }
 
 export interface ProductData {
-    uuid: string
+    product_uuid: string
     name: string
     slug: string
     price: number
@@ -44,6 +46,7 @@ export interface ProductData {
     gallery_images: string[]
     liked: boolean
     stock: number
+    store_name: string
 }
 
 export interface ProductDetailsResponse {
@@ -109,6 +112,7 @@ const getErrorMessage = (error: unknown): string => {
 export default function ProductDetail() {
     const params = useParams()
     const router = useRouter()
+    const { user, isAuthenticated} = useAuth();
     const queryClient = useQueryClient()
     const [isPending, startTransition] = useTransition()
     const slug = typeof params.slug === 'string' ? params.slug : undefined
@@ -126,7 +130,16 @@ export default function ProductDetail() {
 
     const product = data?.data
 
-
+    const {mutate: addToCart, isPending: isCartPending} = useMutation({
+        mutationFn: (payload: { slug: string; quantity: number }) =>
+            cartService.addToCart(payload).then((res) => {
+                toast.success(res.message || "Product added to cart");
+            }),
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ["cart"]}),
+        onError: (error) => {
+            toast.error(error?.message || "Please try again");
+        },
+    });
 
     const {mutate: toggleFavorite, isPending: isFavoritePending} = useMutation<
         FavoriteResponse,
@@ -179,10 +192,16 @@ export default function ProductDetail() {
     }, [])
 
     const handleAddToCart = useCallback(() => {
-        toast.success(`Added ${quantity} item(s) to cart`)
-    }, [quantity])
+        if (slug && product && quantity > 0 && quantity <= product.stock) {
+            addToCart({slug, quantity});
+        }
+    }, [addToCart, slug, quantity, product]);
 
     const handleCheckout = useCallback(() => {
+        if(!user && !isAuthenticated){
+            toast.error("Please login to checkout")
+            return
+        }
         if (!product) {
             toast.error("Product not available")
             return
@@ -190,20 +209,20 @@ export default function ProductDetail() {
 
         startTransition(() => {
             const checkoutData = {
-                uuid: product.uuid,
+                uuid: product.product_uuid,
                 quantity: quantity
             }
 
             queryClient.setQueryData(["checkout-items"], [checkoutData])
 
             const searchParams = new URLSearchParams()
-            searchParams.append("uuid", product.uuid)
+            searchParams.append("items", product.product_uuid)
             searchParams.append("quantity", quantity.toString())
 
-            // router.push(`/checkout?${searchParams.toString()}`)
-            router.push('/checkout')
+            router.push(`/checkout?${searchParams.toString()}`)
+            // router.push('/checkout')
         })
-    }, [product, quantity, queryClient, router])
+    }, [product, quantity, queryClient, router, user, isAuthenticated])
 
     if (isLoading) return <LoadingSkeleton/>
     if (error || !product) return <ErrorState/>
@@ -295,6 +314,13 @@ export default function ProductDetail() {
                                             {idx < product.categories.length - 1 && ', '}
                                         </span>
                                     ))}
+                                </div>
+
+                                <div className="flex items-center gap-2 text-xs sm:text-sm">
+                                    <Store className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                                    <span className="font-medium text-muted-foreground">
+                                        Sold by: <span className="text-foreground">{product.store_name}</span>
+                                    </span>
                                 </div>
 
                                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
@@ -450,7 +476,7 @@ export default function ProductDetail() {
                                             !isInStock && "opacity-60"
                                         )}
                                         onClick={handleAddToCart}
-                                        disabled={!isInStock}
+                                        disabled={!isInStock || isCartPending}
                                         aria-label={isInStock ? 'Add to cart' : 'Out of stock'}
                                     >
                                         <ShoppingCart className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4"/>

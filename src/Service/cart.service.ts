@@ -17,19 +17,34 @@ class CartService extends HttpServices {
         }
     }
 
-    async getCartDetails(itemUuid: string[]) {
+    // async getCartDetails(itemUuid: string[]) {
+    //     try {
+    //         return await this.postRequest({
+    //             url: `/market/checkout-detail`,
+    //             data: itemUuid,
+    //             config: {
+    //                 auth: true,
+    //             },
+    //         });
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+    
+    async getCartDetails(payload: any) {
         try {
             return await this.postRequest({
-                url: `/market/checkout-detail`,
-                data: itemUuid,
-                config: {
-                    auth: true,
-                },
+            url: `/market/checkout-detail`,
+            data: payload,  
+            config: {
+                auth: true,
+            },
             });
         } catch (error) {
             throw error;
         }
     }
+
 
 
     async updateCartItem(itemUuid: string, quantity: number) {

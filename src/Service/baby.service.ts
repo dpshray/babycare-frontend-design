@@ -34,7 +34,6 @@ class BabyService extends HttpService {
             throw error
 
         }
-
     }
 
     async getBabbyDetails() {
@@ -42,7 +41,7 @@ class BabyService extends HttpService {
             return await this.getRequest({
                 url: '/infant',
                 config: {
-                    auth: true
+                    auth: true,
                 }
             })
         } catch (error) {
@@ -72,19 +71,19 @@ class BabyService extends HttpService {
 
     async updateBaby(id: number, data: any) {
         try {
-
-            return await this.putRequest({
+            data.append("_method", "PATCH");
+            return await this.postRequest({
                 url: `/infant/${id}`,
                 data: data,
                 config: {
                     auth: true,
+                    file: true
 
                 }
             })
         } catch (error) {
             throw error
         }
-
     }
 
     async deleteBaby(id: number) {
@@ -102,10 +101,10 @@ class BabyService extends HttpService {
 
     }
 
-    async updateBabyVaccineDate(vaccineId: number) {
+    async updateBabyVaccineDate(infantId: number, vaccineId: number) {
         try {
             return await this.patchRequest({
-                url: `/update-vaccinated-date/${vaccineId}`,
+                url: `/update-vaccinated-date/${infantId}`,
                 data: { vaccine_id: vaccineId },
                 config: { auth: true },
             });

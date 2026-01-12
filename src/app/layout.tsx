@@ -59,9 +59,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-        <body className={`${openSans.variable} ${mulish.variable} antialiased`}>
-        <RootProviders>{children}</RootProviders>
-        </body>
+            <body className={`${openSans.variable} ${mulish.variable} antialiased`}>
+                <RootProviders>{children}</RootProviders>
+            </body>
         </html>
     );
 }
