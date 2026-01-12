@@ -53,7 +53,7 @@ const VaccineFormModal: React.FC<VaccineModalProps> = ({
     const updateVaccineStatus = useMutation({
         mutationFn: async (id: number) => {
             console.log('Vaccine Id',id)
-            await babyService.updateBabyVaccineDate(id)
+            await babyService.updateBabyVaccineDate(babyId, id);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["baby-vaccines", babyId] });

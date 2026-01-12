@@ -50,6 +50,8 @@ export default function CheckoutPage() {
     const [checkoutItemUuids, setCheckoutItemUuids] = useState<string[]>([])
     const [selectedAddress, setSelectedAddress] = useState<Address | null>(null)
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
+    const quantity = searchParams.get("quantity")
+    const isBuyNow = Boolean(quantity);
 
     const {
         register,
@@ -79,11 +81,41 @@ export default function CheckoutPage() {
         setCheckoutItemUuids(paramItems)
     }, [searchParams, router])
 
-    const {data, isLoading} = useQuery({
-        queryKey: ["checkout-items", checkoutItemUuids],
-        queryFn: () => cartService.getCartDetails(checkoutItemUuids),
+    // const {data, isLoading} = useQuery({
+    //     queryKey: ["checkout-items", checkoutItemUuids],
+    //     queryFn: () => cartService.getCartDetails(checkoutItemUuids),
+    //     enabled: checkoutItemUuids.length > 0,
+    // })
+    // const { data, isLoading } = useQuery({
+    //     queryKey: ["checkout-items", checkoutItemUuids, quantity],
+    //     queryFn: () => {
+    //         const payload = checkoutItemUuids.map((uuid) => ({
+    //             uuid,
+    //             quantity: Number(quantity) ?? 1, 
+    //         }));
+
+    //         return cartService.getCartDetails(payload);
+    //     },
+    //     enabled: checkoutItemUuids.length > 0,
+    // });
+
+    const { data, isLoading } = useQuery({
+        queryKey: ["checkout-items", checkoutItemUuids, quantity],
+        queryFn: () => {
+            
+            if (!isBuyNow) {
+                return cartService.getCartDetails(checkoutItemUuids);
+            }
+
+            const payload = checkoutItemUuids.map((uuid) => ({
+                uuid,
+                quantity: Number(quantity) || 1,
+            }));
+
+            return cartService.getCartDetails(payload);
+        },
         enabled: checkoutItemUuids.length > 0,
-    })
+    });
 
     const {data: addressData, isLoading: addressLoading} = useQuery({
         queryKey: ["address"],

@@ -18,18 +18,20 @@ class HttpServices {
     private headers: Record<string, string> = {};
 
     constructor() {
-        if (typeof window !== "undefined" && !localStorage.getItem("_baby")) {
-            localStorage.setItem("_baby", "");
-        }
+        // if (typeof window !== "undefined" && !localStorage.getItem("_baby")) {
+        //     localStorage.setItem("_baby", "");
+        // }
     }
 
     private setHeaders(config?: HeaderConfigProps) {
         this.headers = {};
 
         if (config?.auth) {
-            let token = localStorage.getItem("_baby") || "";
-            localStorage.setItem("_baby", token);
-            this.headers["Authorization"] = `Bearer ${token}`;
+            const token = localStorage.getItem("_baby");
+            // localStorage.setItem("_baby", token);
+            if (token) {
+                this.headers["Authorization"] = `Bearer ${token}`;
+            }
         }
 
         if (config?.file) {

@@ -14,6 +14,7 @@ export interface Product {
     discount_percent: number;
     liked: boolean;
     stock: number;
+    store_name: string;
 }
 
 export interface ProductResponse {

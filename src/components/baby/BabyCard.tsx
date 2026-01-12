@@ -72,9 +72,10 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
     }, []);
 
     const handleEditSuccess = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ["babies"] });
         setIsEditModalOpen(false);
-        if (onEditAction) onEditAction();
-    }, [onEditAction]);
+        // if (onEditAction) onEditAction();
+    }, [queryClient]);
 
     const handleVaccines = useCallback(() => {
         setIsVaccineModalOpen(true);
@@ -114,6 +115,10 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
             default:
                 return "from-blue-500 to-purple-500";
         }
+    };
+
+    const convertGenderToNumber = (gender: "MALE" | "FEMALE" | "OTHER"): 0 | 1 => {
+        return gender === "MALE" ? 0 : 1;
     };
 
     return (
@@ -203,7 +208,7 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
                 initialData={{
                     name: baby.name,
                     dob: baby.dob,
-                    gender: baby.gender as any,
+                    gender: convertGenderToNumber(baby.gender),
                     image: baby.image as any,
                 }}
                 babyId={baby.id}
