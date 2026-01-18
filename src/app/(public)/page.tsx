@@ -7,9 +7,10 @@ import {AppPromo} from "@/components/Slider/App-promo";
 import {useProducts} from "@/hooks/useProduct";
 import {FeaturesSection} from "@/components/header/features-section";
 import { VendorCTASection } from "@/components/header/VendorCTASection";
+import { ProductCardSkeleton } from "@/components/skeleton/ProductCardSkeleton";
 
 export default function Page() {
-    const {products, isLoading, totalPages} = useProducts({
+    const {products, isLoading} = useProducts({
         page: 1,
         per_page: 8,
 
@@ -24,9 +25,14 @@ export default function Page() {
                         Latest <span className="text-blue-500">In Store</span>
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {products.map((items, i) => (
-                            <ProductCard product={items} key={i}/>
-                        ))}
+                        {isLoading
+                            ? Array.from({ length: 8 }).map((_, i) => (
+                                <ProductCardSkeleton key={i} />
+                            ))
+                            : products.map((item, i) => (
+                                <ProductCard product={item} key={i} />
+                            )
+                        )}
                     </div>
                 </div>
             </section>

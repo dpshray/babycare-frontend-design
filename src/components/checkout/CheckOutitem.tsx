@@ -9,7 +9,7 @@ interface CheckOutItem {
     quantity: number
     price: number
     subtotal: number
-    name?: string
+    item_name?: string
 }
 
 interface CheckOutItemProps {
@@ -34,7 +34,7 @@ function CheckOutItemCard({item, className}: CheckOutItemProps) {
             <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-md overflow-hidden bg-background">
                 <Image
                     src={item.image || "/placeholder.svg"}
-                    alt={item.name || "Product"}
+                    alt={item.item_name || "Product"}
                     fill
                     className="object-cover"
                     sizes="(max-width: 640px) 64px, 80px"
@@ -43,7 +43,7 @@ function CheckOutItemCard({item, className}: CheckOutItemProps) {
 
             <div className="flex-1 min-w-0 space-y-1">
                 <h3 className="font-medium text-sm sm:text-base line-clamp-2 text-foreground">
-                    {item.name || "Product Name"}
+                    {item.item_name || "Product Name"}
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground capitalize">
                     {item.item_type}

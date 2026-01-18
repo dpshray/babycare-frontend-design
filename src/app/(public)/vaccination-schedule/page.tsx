@@ -8,6 +8,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
 import babyService from "@/Service/babay.service";
+import { VaccinePageSkeleton } from "@/components/skeleton/VaccinePageSkeleton";
 
 interface Vaccine {
     id: number;
@@ -37,12 +38,7 @@ export default function VaccinePage() {
     });
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-background">
-                <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 animate-spin text-primary mb-4"/>
-                <p className="text-base sm:text-lg text-muted-foreground">Loading vaccine schedule...</p>
-            </div>
-        );
+        return <VaccinePageSkeleton />
     }
 
     if (error) {
