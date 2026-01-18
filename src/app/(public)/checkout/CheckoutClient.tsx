@@ -19,6 +19,7 @@ import AddressFormModal from "@/app/(public)/checkout/AddressFormPage"
 import TextInputField from "@/components/field/TextInputField"
 import SummaryCard from "@/components/checkout/SummaryCard"
 import {AddressCard} from "@/components/address/AddressCard"
+import { CartPageSkeleton } from "@/components/skeleton/CartPageSkeleton"
 
 interface Address {
     id: string
@@ -181,11 +182,7 @@ export default function CheckoutPage() {
     }, [orderItems, router])
 
     if (isLoading) {
-        return (
-            <main className="flex min-h-screen items-center justify-center bg-background">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" aria-label="Loading"/>
-            </main>
-        )
+        return <CartPageSkeleton />
     }
 
     return (

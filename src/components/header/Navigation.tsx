@@ -20,6 +20,7 @@ import {
 import {cn} from "@/lib/utils"
 import {useAuth} from "@/hooks/useAuth"
 import {authService} from "@/Service/auth.service"
+import { useQueryClient } from "@tanstack/react-query"
 
 const navigationLinks = [
     {href: "/products", label: "Shop"},
@@ -32,6 +33,7 @@ export default function NavigationBar({className}: { className?: string }) {
     const {user, isLoading} = useAuth()
     const pathname = usePathname()
     const router = useRouter()
+    const queryClient = useQueryClient()
     const searchInputRef = useRef<HTMLInputElement>(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -72,12 +74,13 @@ export default function NavigationBar({className}: { className?: string }) {
         try {
             await authService.logout()
             localStorage.removeItem("_baby")
+            queryClient.removeQueries({ queryKey: ["auth", "me"] })
             toast.success("Logout successful", {id: toastId})
             router.push("/")
         } catch (error: any) {
             toast.error(error?.message || "Logout failed", {id: toastId})
         }
-    }, [router])
+    }, [router, queryClient])
 
     const handleProfile = useCallback(() => router.push("/profile"), [router])
 
@@ -207,7 +210,7 @@ export default function NavigationBar({className}: { className?: string }) {
                 </div>
             </div>
 
-            <nav className="border-b">
+            <nav className="border-b px-6 sm:px-8">
                 <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
                     <Link href="/"
                           className="flex items-center gap-2 hover:opacity-90 transition-opacity flex-shrink-0">

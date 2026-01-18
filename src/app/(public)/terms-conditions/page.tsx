@@ -67,7 +67,7 @@ export default function TermsAndConditions() {
             </div>
 
             {/* Main Content */}
-            <main className="max-w-6xl mx-auto px-6 py-12">
+            <main className="max-w-7xl mx-auto px-6 py-12">
                 <div className="grid lg:grid-cols-4 gap-8">
                     {/* Table of Contents */}
                     <div className="lg:col-span-1">
