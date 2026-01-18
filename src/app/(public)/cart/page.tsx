@@ -15,6 +15,7 @@ import {toast} from "sonner"
 import {QUERY_STALE_TIME} from "@/config/app-constant"
 import {CartSummaryCard} from "@/app/(public)/cart/CartSummaryCard"
 import { useAuth } from "@/hooks/useAuth"
+import { CartPageSkeleton } from "@/components/skeleton/CartPageSkeleton"
 
 export interface CartItem {
     item_uuid: string
@@ -134,15 +135,7 @@ export default function CartPage() {
 
 
     if (isLoading) {
-        return (
-            <main className="min-h-screen flex items-center justify-center px-4 bg-background">
-                <div className="text-center space-y-4">
-                    <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 animate-spin text-primary mx-auto"
-                             aria-hidden="true"/>
-                    <p className="text-base sm:text-lg text-muted-foreground">Loading your cart...</p>
-                </div>
-            </main>
-        )
+        return <CartPageSkeleton />
     }
 
     if (error) {

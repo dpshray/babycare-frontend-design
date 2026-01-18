@@ -8,6 +8,7 @@ import {Button} from "@/components/ui/button";
 import {Card, CardContent} from "@/components/ui/card";
 import BabyCard from "@/components/baby/BabyCard";
 import BabyFormModal from "@/components/baby/BabyFormModal";
+import { BabyPageSkeleton } from "@/components/skeleton/BabyPageSkeleton";
 
 export interface Baby {
     id: number;
@@ -30,16 +31,7 @@ export default function BabyPage() {
     });
 
     if (isLoading) {
-        return (
-            <div
-                className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-                <div className="text-center">
-                    <div
-                        className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-                    <p className="text-gray-600 font-medium">Loading babies...</p>
-                </div>
-            </div>
-        );
+        return <BabyPageSkeleton />
     }
 
     return (

@@ -13,8 +13,8 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, Calendar, Loader2, Shield, Syringe } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import babyService from "@/Service/baby.service";
-import { format } from "date-fns";
 import {formatDate} from "@/lib/utils";
+import { toast } from "sonner";
 
 interface Vaccine {
     id: number;
@@ -23,7 +23,7 @@ interface Vaccine {
     diseases_covered: string[];
     actual_date: string;
     reminder: string;
-    status?: "COMPLETED" | "INCOMPLETE";
+    is_completed: boolean;
 }
 
 interface VaccineModalProps {
@@ -56,19 +56,22 @@ const VaccineFormModal: React.FC<VaccineModalProps> = ({
             await babyService.updateBabyVaccineDate(babyId, id);
         },
         onSuccess: () => {
+            toast.success("Vaccine status updated successfully");
             queryClient.invalidateQueries({ queryKey: ["baby-vaccines", babyId] });
         },
     });
 
 
 
-    const getStatusColor = (status?: string): string =>
-        status === "COMPLETED"
+    const getStatusColor = (isCompleted: boolean): string =>
+        isCompleted
             ? "bg-green-100 text-green-800 border-green-200"
             : "bg-gray-100 text-gray-800 border-gray-200";
-
-    const handleStatusToggle = (vaccineId: number) => {
-        updateVaccineStatus.mutate(vaccineId);
+            
+    const handleStatusToggle = (vaccineId: number, isCompleted: boolean) => {
+        if (!isCompleted) {
+            updateVaccineStatus.mutate(vaccineId);
+        }
     };
 
     return (
@@ -118,10 +121,10 @@ const VaccineFormModal: React.FC<VaccineModalProps> = ({
 
 interface VaccineItemProps {
     vaccine: Vaccine;
-    onStatusToggle: (id: number) => void;
+    onStatusToggle: (id: number, isCompleted: boolean) => void;
     isUpdating: boolean;
     formatDateDisplay: (date: string) => string;
-    getStatusColor: (status?: string) => string;
+    getStatusColor: (isCompleted: boolean) => string;
 }
 
 const VaccineItem: React.FC<VaccineItemProps> = ({
@@ -131,7 +134,7 @@ const VaccineItem: React.FC<VaccineItemProps> = ({
                                                      formatDateDisplay,
                                                      getStatusColor,
                                                  }) => {
-    const isCompleted = vaccine.status === "COMPLETED";
+    const isCompleted = vaccine.is_completed;
 
     return (
         <div className="border-2 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
@@ -176,23 +179,28 @@ const VaccineItem: React.FC<VaccineItemProps> = ({
                             )}
                         </div>
                     </div>
-                    <Badge className={getStatusColor(vaccine.status)}>
-                        {vaccine.status ?? "INCOMPLETE"}
+                    <Badge className={getStatusColor(isCompleted)}>
+                        {isCompleted ? "COMPLETED" : "INCOMPLETE"}
                     </Badge>
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t border-gray-200">
                     <Label
                         htmlFor={`vaccine-${vaccine.id}`}
-                        className="text-sm font-medium text-gray-700 cursor-pointer"
+                        className={`text-sm font-medium cursor-pointer ${
+                            isCompleted 
+                                ? "text-gray-400 cursor-not-allowed" 
+                                : "text-gray-700"
+                        }`}
                     >
-                        Mark as {isCompleted ? "Incomplete" : "Complete"}
+                        {isCompleted ? "Completed" : "Mark as Complete"}
                     </Label>
                     <Switch
                         id={`vaccine-${vaccine.id}`}
                         checked={isCompleted}
-                        onCheckedChange={() => onStatusToggle(vaccine.id)}
-                        disabled={isUpdating}
+                        onCheckedChange={() => onStatusToggle(vaccine.id, isCompleted)}
+                        disabled={isCompleted || isUpdating}
+                        className={isCompleted ? "opacity-50 cursor-not-allowed" : ""}
                     />
                 </div>
             </div>

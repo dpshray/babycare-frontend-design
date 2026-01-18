@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import babyService from "@/Service/babay.service"
 import { QUERY_STALE_TIME } from "@/config/app-constant"
 import CustomPagination from "@/components/Custom-Pagination"
+import { HospitalCardSkeleton } from "@/components/skeleton/HospitalCardSkeleton"
 
 interface Hospital {
     id: number
@@ -46,17 +47,6 @@ export default function HealthCenter() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }, [])
 
-    if (isLoading) {
-        return (
-            <main className="min-h-screen flex items-center justify-center bg-background">
-                <div className="text-center space-y-4">
-                    <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-                    <p className="text-lg text-muted-foreground">Loading health centers...</p>
-                </div>
-            </main>
-        )
-    }
-
     if (error) {
         return (
             <main className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -92,7 +82,13 @@ export default function HealthCenter() {
                     )}
                 </header>
 
-                {hospitals.length === 0 ? (
+                {isLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                        {Array.from({ length: 9 }).map((_, i) => (
+                            <HospitalCardSkeleton key={i} />
+                        ))}
+                    </div>
+                ) : hospitals.length === 0 ? (
                     <div className="flex flex-col items-center py-16 text-center">
                         <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
                             <MapPin className="w-10 h-10 text-muted-foreground" />

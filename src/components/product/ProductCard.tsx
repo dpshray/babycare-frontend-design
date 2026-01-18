@@ -44,7 +44,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({product, className}
             cartService.addToCart(payload).then((res) => {
                 toast.success(res.message || "Product added to cart");
             }),
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ["cart"]}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["cart"]});
+            queryClient.invalidateQueries({queryKey: ["auth"]});
+        },
+
         onError: (error) => {
             toast.error(error?.message || "Please try again");
         },
@@ -58,6 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({product, className}
             setIsLiked((prev) => !prev);
             queryClient.invalidateQueries({queryKey: ["products"]});
             queryClient.invalidateQueries({queryKey: ["favorites"]});
+            queryClient.invalidateQueries({queryKey: ["auth"]});
         },
         onError: (error) => {
             toast.error(error?.message || "Please try again");

@@ -12,7 +12,6 @@ export function Footer() {
     const socialMediaLinks = [
         { label: "Facebook", href: BABY_CARE_FACEBOOK_URL, icon: <Facebook size={20} /> },
         { label: "Instagram", href: BABY_CARE_INSTAGRAM_URL, icon: <Instagram size={20} /> },
-        { label: "Youtube", href: "#", icon: <Youtube size={20} /> },
     ]
 
     const serviceLinks = [
@@ -152,10 +151,10 @@ export function Footer() {
                         © {new Date().getFullYear()} Babycare Studios. All rights reserved.
                     </p>
                     <nav aria-label="Legal" className="flex flex-wrap justify-center gap-4 sm:gap-6 uppercase tracking-wider">
-                        <Link href="#" className="hover:text-white transition-colors focus:outline-none focus:text-white">
+                        <Link href="/privacy-policy" className="hover:text-white transition-colors focus:outline-none focus:text-white">
                             Privacy Policy
                         </Link>
-                        <Link href="#" className="hover:text-white transition-colors focus:outline-none focus:text-white">
+                        <Link href="/terms-conditions" className="hover:text-white transition-colors focus:outline-none focus:text-white">
                             Terms & Conditions
                         </Link>
                         <Link href="#" className="hover:text-white transition-colors focus:outline-none focus:text-white">
