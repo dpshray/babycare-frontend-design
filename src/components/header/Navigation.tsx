@@ -8,7 +8,6 @@ import {
   Baby,
   Heart,
   LogOut,
-  Mail,
   MapPin,
   Menu,
   Phone,
@@ -29,7 +28,6 @@ import {
 } from "@/components/ui/hover-card";
 import {
   BABY_CARE_ADDRESS,
-  BABY_CARE_APP_STORE_URL,
   BABY_CARE_PHONE1,
   BABY_CARE_PHONE2,
   BABY_CARE_PLAY_STORE_URL,
@@ -268,14 +266,6 @@ export default function NavigationBar({ className }: { className?: string }) {
               className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
             >
               <Smartphone className="h-3.5 w-3.5" /> Play Store
-            </a>
-            <a
-              href={BABY_CARE_APP_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
-            >
-              <Smartphone className="h-3.5 w-3.5" /> App Store
             </a>
           </div>
         </div>
