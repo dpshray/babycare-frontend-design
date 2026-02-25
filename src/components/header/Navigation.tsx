@@ -30,7 +30,6 @@ import {
 import {
   BABY_CARE_ADDRESS,
   BABY_CARE_APP_STORE_URL,
-  BABY_CARE_EMAIL,
   BABY_CARE_PHONE1,
   BABY_CARE_PHONE2,
   BABY_CARE_PLAY_STORE_URL,
@@ -255,13 +254,7 @@ export default function NavigationBar({ className }: { className?: string }) {
               <Phone className="h-3.5 w-3.5" />
               <span className="hidden lg:inline">{BABY_CARE_PHONE2}</span>
             </a>
-            <a
-              href={`mailto:${BABY_CARE_EMAIL}`}
-              className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
-            >
-              <Mail className="h-3.5 w-3.5" />
-              <span className="hidden lg:inline">{BABY_CARE_EMAIL}</span>
-            </a>
+
             <span className="flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" />
               <span className="hidden xl:inline">{BABY_CARE_ADDRESS}</span>

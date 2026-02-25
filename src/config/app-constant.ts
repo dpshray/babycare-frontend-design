@@ -6,7 +6,6 @@ const MAX_PAGES_TO_SHOW = 5;
 
 const BABY_CARE_PHONE1 = "9802334171";
 const BABY_CARE_PHONE2 = "9705477368";
-const BABY_CARE_EMAIL = "babycare@gmail.com";
 const BABY_CARE_ADDRESS = "Lokanthali, Bhaktapur";
 const BABY_CARE_ADDRESS_URL = "https://www.google.com/maps/place/Kathmandu";
 const BABY_CARE_APP_NAME = "BabyCare";
@@ -35,7 +34,6 @@ export {
   GC_TIME,
   BABY_CARE_PHONE1,
   BABY_CARE_PHONE2,
-  BABY_CARE_EMAIL,
   BABY_CARE_ADDRESS,
   BABY_CARE_APP_NAME,
   BABY_CARE_APP_URL,
