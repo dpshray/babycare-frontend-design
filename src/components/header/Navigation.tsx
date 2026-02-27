@@ -10,6 +10,7 @@ import {
   LogOut,
   MapPin,
   Menu,
+  Package,
   Phone,
   Search,
   ShoppingCart,
@@ -192,6 +193,14 @@ export default function NavigationBar({ className }: { className?: string }) {
                 className="justify-start gap-2"
               >
                 <Baby className="h-4 w-4" /> Baby
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/order")}
+                className="justify-start gap-2"
+              >
+                <Package className="h-4 w-4" /> Orders
               </Button>
               <Button
                 variant="outline"
