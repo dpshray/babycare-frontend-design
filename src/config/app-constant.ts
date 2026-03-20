@@ -47,3 +47,10 @@ export {
   BABY_CARE_LINKEDIN_URL,
   GOOGLE_CLIENT_ID,
 };
+
+export interface PageParams {
+    page?: number;
+    per_page?: number;
+    search?: string;
+    [key: string]: string | number | boolean | undefined; 
+}

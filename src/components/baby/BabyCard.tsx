@@ -7,6 +7,9 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import babyService from "@/Service/baby.service";
 import BabyFormModal from "@/components/baby/BabyFormModal";
 import VaccineFormModal from "@/components/baby/VaccineModal";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import NepaliDate from "nepali-date-converter"
 
 export interface Baby {
     id: number;
@@ -14,6 +17,9 @@ export interface Baby {
     dob: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     image: string | null;
+    weight: number;
+    height: number;
+    head_circumference: number;
 }
 
 interface BabyCardProps {
@@ -22,8 +28,9 @@ interface BabyCardProps {
     onDeleteAction?: () => void;
 }
 
-const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction}) => {
+const BabyCard: React.FC<BabyCardProps> = ({baby, onDeleteAction}) => {
     const queryClient = useQueryClient();
+    const router = useRouter()
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isVaccineModalOpen, setIsVaccineModalOpen] = useState(false);
@@ -44,20 +51,22 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
     });
 
     const calculateAge = useCallback((dob: string) => {
-        const diff = Date.now() - new Date(dob).getTime();
-        const age = new Date(diff);
-        const years = age.getUTCFullYear() - 1970;
-        const months = age.getUTCMonth();
-        const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+        const [bsYear, bsMonth, bsDay] = dob.split("-").map(Number)
+        
+        // Accurately convert BS to AD
+        const nepaliDate = new NepaliDate(bsYear, bsMonth - 1, bsDay)
+        const adDate = nepaliDate.toJsDate() // returns JS Date in AD
+        
+        const diff = Date.now() - adDate.getTime()
+        const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const years = Math.floor(totalDays / 365)
+        const months = Math.floor((totalDays % 365) / 30)
+        const days = Math.floor((totalDays % 365) % 30)
 
-        if (years > 0) {
-            return `${years}y ${months}m`;
-        } else if (months > 0) {
-            return `${months}m ${days}d`;
-        } else {
-            return `${days}d`;
-        }
-    }, []);
+        if (years > 0) return `${years}y ${months}m`
+        if (months > 0) return `${months}m ${days}d`
+        return `${days}d`
+    }, [])
 
     const handleDelete = useCallback(() => {
         setIsDeleteModalOpen(true);
@@ -124,16 +133,18 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
     return (
         <>
             <div
-                className="overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-gray-300 bg-white group">
+                onClick={() => router.push(`/baby/${baby.id}`)}
+                className="overflow-hidden cursor-pointer rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-gray-300 bg-white group">
                 <div
                     className={`bg-gradient-to-br ${getGradient(
                         baby.gender
                     )} relative h-40 sm:h-48 md:h-56 flex items-center justify-center`}
                 >
                     {baby.image ? (
-                        <img
+                        <Image
                             src={baby.image}
                             alt={baby.name}
+                            fill
                             className="w-full h-full object-cover"
                             loading="lazy"
                         />
@@ -166,13 +177,13 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
                     <div className="mb-4 sm:mb-6 pt-3 sm:pt-4 border-t border-gray-200">
                         <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
                             <Clock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0"/>
-                            <span className="truncate">Born: {formatDateDisplay(baby.dob)}</span>
+                            <span className="truncate">Born: {baby.dob}</span>
                         </div>
                     </div>
 
                     <div className="flex gap-2">
                         <Button
-                            onClick={handleEditForm}
+                            onClick={(e) => { e.stopPropagation(); handleEditForm(); }}
                             variant="outline"
                             size="sm"
                             className="flex-1 group-hover:bg-blue-50 group-hover:border-blue-300 hover:text-blue-700 text-xs sm:text-sm"
@@ -181,7 +192,7 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
                             <span className="hidden xs:inline">Edit</span>
                         </Button>
                         <Button
-                            onClick={handleDelete}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(); }}
                             variant="outline"
                             size="sm"
                             className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 text-xs sm:text-sm"
@@ -190,7 +201,7 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
                             <span className="hidden xs:inline">Delete</span>
                         </Button>
                         <Button
-                            onClick={handleVaccines}
+                            onClick={(e) => { e.stopPropagation(); handleVaccines(); }}
                             variant="outline"
                             size="sm"
                             className="flex-1 group-hover:bg-green-50 group-hover:border-green-300 hover:text-green-700 text-xs sm:text-sm"
@@ -210,6 +221,9 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onEditAction, onDeleteAction})
                     dob: baby.dob,
                     gender: convertGenderToNumber(baby.gender),
                     image: baby.image as any,
+                    height: baby.height,
+                    weight: baby.weight,
+                    head_circumference: baby.head_circumference
                 }}
                 babyId={baby.id}
                 onCloseAction={() => setIsEditModalOpen(false)}
