@@ -1,3 +1,4 @@
+import { PageParams } from "@/config/app-constant";
 import HttpService from "@/Service/httpService";
 
 
@@ -112,7 +113,39 @@ class BabyService extends HttpService {
             throw error;
         }
     }
+    
+    async infantCalculator(payload: {
+        head_circumference: number
+        weight: number
+        height: number
+        infant_id: number
+    }) {
+        try {
+            return await this.postRequest({
+                url: '/infant-calculator',
+                config: {
+                    auth: true,
+                    params: payload,
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
 
+    async getInfantCalculatorHistory(infantId: number, params?: PageParams) {
+        try {
+            return await this.getRequest({
+                url: `/infant-calculator/history/${infantId}`,
+                config: {
+                    auth: true,
+                    params
+                }
+            })
+        } catch (error) {
+            throw error;
+        }
+    }
 
 }
 
