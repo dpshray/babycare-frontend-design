@@ -20,8 +20,13 @@ export function useInfantCalculator(params: InfantCalculatorParams) {
     return useQuery({
         queryKey: ["infant-calculator", params.infant_id, params.weight, params.height, params.head_circumference],
         queryFn: async () => {
-            const res = await babyService.infantCalculator(params)
-            return res.data
+            try {
+                const res = await babyService.infantCalculator(params)
+                return res.data
+            } catch (error: any) {
+                const message = error?.message ?? "Calculation failed. Please try again."
+                throw new Error(message)
+            }
         },
         enabled: !!params.infant_id && !!params.weight && !!params.height && !!params.head_circumference,
         staleTime: QUERY_STALE_TIME,
