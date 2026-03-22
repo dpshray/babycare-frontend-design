@@ -54,7 +54,7 @@ function MetricPill({ metric, label }: { metric: MetricResult; label: string }) 
                 </p>
             )}
             {metric.app_action && metric.action_required && (
-                <p className="text-[10px] text-gray-500 leading-tight line-clamp-2">
+                <p className="text-[10px] text-gray-500 leading-tight">
                     {metric.app_action}
                 </p>
             )}
