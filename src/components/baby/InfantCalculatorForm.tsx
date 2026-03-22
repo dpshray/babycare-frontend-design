@@ -104,7 +104,7 @@ export default function InfantCalculatorForm({ infantId }: InfantCalculatorFormP
         resolver: zodResolver(calculatorSchema),
     })
 
-    const { data, isLoading, isError } = useInfantCalculator(
+    const { data, isLoading, isError, error } = useInfantCalculator(
         submitted
             ? {
                   infant_id: infantId,
@@ -219,7 +219,7 @@ export default function InfantCalculatorForm({ infantId }: InfantCalculatorFormP
             {isError && (
                 <div className="flex items-center gap-2 text-destructive text-sm bg-destructive/10 rounded-lg p-3">
                     <AlertCircle className="w-4 h-4 shrink-0" />
-                    Failed to calculate. Please try again.
+                    {(error as Error)?.message ?? "Failed to calculate. Please try again."}
                 </div>
             )}
 
