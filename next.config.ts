@@ -17,6 +17,12 @@ const nextConfig: NextConfig = {
                 pathname: '/storage/**',
             },
             {
+                protocol: 'http',
+                hostname: '192.168.1.68',
+                port: '8000',
+                pathname: '/storage/**',
+            },
+            {
                 protocol: 'https',
                 hostname: 'marketplace.thebabycareapp.com',
                 pathname: '/storage/**',

@@ -1,0 +1,200 @@
+'use client'
+
+import {
+    CartesianGrid,
+    ComposedChart,
+    Legend,
+    Line,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TrendingUp } from "lucide-react"
+import { useState } from "react"
+import { useGetInfantChart } from "@/hooks/useInfant"
+
+type Indicator = "weight" | "height" | "head_circumference"
+
+interface ChartDataPoint {
+    age_months: number
+    [key: string]: number | undefined
+}
+
+interface WhoLines {
+    p3: { age_months: number; value: number }[]
+    p50: { age_months: number; value: number }[]
+    p97: { age_months: number; value: number }[]
+}
+
+interface InfantChartData {
+    has_data: boolean
+    indicator: string
+    baby: { age_months: number; raw: number; percentile: number }[]
+    who_lines: WhoLines
+}
+
+interface Props {
+    infantId: number
+}
+
+const INDICATORS: { value: Indicator; label: string; unit: string }[] = [
+    { value: "weight",             label: "Weight",             unit: "kg" },
+    { value: "height",             label: "Height",             unit: "cm" },
+    { value: "head_circumference", label: "Head Circumference", unit: "cm" },
+]
+
+const CustomTooltip = ({ active, payload, label, unit }: any) => {
+    if (!active || !payload?.length) return null
+    return (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3 text-xs space-y-1.5 min-w-[160px]">
+            <p className="font-semibold text-gray-700 mb-2">Age: {label} months</p>
+            {payload.map((entry: any) => (
+                <div key={entry.name} className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: entry.color }} />
+                        <span className="text-gray-600">{entry.name}</span>
+                    </div>
+                    <span className="font-semibold text-gray-900">{entry.value} {unit}</span>
+                </div>
+            ))}
+        </div>
+    )
+}
+
+export default function InfantGrowthChart({ infantId }: Props) {
+    const [activeIndicator, setActiveIndicator] = useState<Indicator>("weight")
+
+    const { data: response, isLoading, isFetching } = useGetInfantChart(infantId, activeIndicator)
+    const data = response?.data as InfantChartData | undefined
+
+    const currentMeta = INDICATORS.find(i => i.value === activeIndicator)!
+
+    let chartData: ChartDataPoint[] = []
+    let latestBaby = null
+
+    if (data?.has_data) {
+        const allAges = Array.from(
+            new Set([
+                ...data.who_lines.p3.map(d => d.age_months),
+                ...data.who_lines.p50.map(d => d.age_months),
+                ...data.who_lines.p97.map(d => d.age_months),
+                ...data.baby.map(d => d.age_months),
+            ])
+        ).sort((a, b) => a - b)
+
+        chartData = allAges.map(age => {
+            const babyPoint = data.baby.find(d => d.age_months === age)
+            const p3  = data.who_lines.p3.find(d => d.age_months === age)
+            const p50 = data.who_lines.p50.find(d => d.age_months === age)
+            const p97 = data.who_lines.p97.find(d => d.age_months === age)
+            return {
+                age_months: age,
+                ...(babyPoint && { Baby: babyPoint.raw }),
+                ...(p3  && { "WHO P3":  p3.value }),
+                ...(p50 && { "WHO P50": p50.value }),
+                ...(p97 && { "WHO P97": p97.value }),
+            }
+        })
+
+        latestBaby = data.baby.at(-1)
+    }
+
+    return (
+        <Card className="shadow-md border border-gray-200 rounded-2xl">
+            <CardHeader className="pb-2">
+                <div className="flex items-start justify-between flex-wrap gap-2">
+                    <div>
+                        <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <TrendingUp className="h-5 w-5 text-violet-500" />
+                            Growth Chart
+                        </CardTitle>
+                        <CardDescription className="text-xs mt-1">
+                            Compared against WHO standard growth lines (P3, P50, P97)
+                        </CardDescription>
+                    </div>
+                    {latestBaby && !isFetching && (
+                        <Badge variant="outline" className="text-violet-700 border-violet-300 bg-violet-50 text-xs font-semibold">
+                            Latest: {latestBaby.raw} {currentMeta.unit} · {latestBaby.percentile}th percentile
+                        </Badge>
+                    )}
+                </div>
+
+                {/* Indicator filter tabs */}
+                <div className="mt-3">
+                    <Tabs value={activeIndicator} onValueChange={v => setActiveIndicator(v as Indicator)}>
+                        <TabsList className="h-8 bg-gray-100 p-0.5 rounded-lg">
+                            {INDICATORS.map(ind => (
+                                <TabsTrigger
+                                    key={ind.value}
+                                    value={ind.value}
+                                    disabled={isFetching}
+                                    className="h-7 px-3 text-xs font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-violet-700 data-[state=active]:shadow-sm disabled:opacity-50"
+                                >
+                                    {ind.label}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </Tabs>
+                </div>
+            </CardHeader>
+
+            <CardContent className="pt-2">
+                {(isLoading || isFetching) ? (
+                    <div className="h-[320px] flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3 text-gray-400">
+                            <div className="w-8 h-8 border-2 border-violet-200 border-t-violet-500 rounded-full animate-spin" />
+                            <span className="text-xs">Loading chart data…</span>
+                        </div>
+                    </div>
+                ) : !data?.has_data ? (
+                    <div className="h-[320px] flex items-center justify-center">
+                        <div className="text-center">
+                            <TrendingUp className="h-10 w-10 mx-auto mb-2 text-gray-200" />
+                            <p className="text-sm font-medium text-gray-500">No data yet</p>
+                            <p className="text-xs text-gray-400 mt-1">Add a measurement to see the growth chart.</p>
+                        </div>
+                    </div>
+                ) : (
+                    <ResponsiveContainer width="100%" height={320}>
+                        <ComposedChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis
+                                dataKey="age_months"
+                                label={{ value: "Age (months)", position: "insideBottom", offset: -2, fontSize: 11, fill: "#9ca3af" }}
+                                tick={{ fontSize: 11, fill: "#6b7280" }}
+                                height={40}
+                            />
+                            <YAxis
+                                tick={{ fontSize: 11, fill: "#6b7280" }}
+                                label={{ value: currentMeta.unit, angle: -90, position: "insideLeft", offset: 10, fontSize: 11, fill: "#9ca3af" }}
+                                width={40}
+                            />
+                            <Tooltip content={<CustomTooltip unit={currentMeta.unit} />} />
+                            <Legend
+                                wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }}
+                                iconType="circle"
+                                iconSize={8}
+                            />
+
+                            <Line dataKey="WHO P97" stroke="#475569" strokeWidth={2} dot={false} />
+                            <Line dataKey="WHO P50" stroke="#64748b" strokeWidth={2} dot={false} />
+                            <Line dataKey="WHO P3"  stroke="#94a3b8" strokeWidth={2} dot={false} />
+
+                            <Line
+                                dataKey="Baby"
+                                stroke="#8b5cf6"
+                                strokeWidth={2.5}
+                                dot={{ r: 5, fill: "#8b5cf6", strokeWidth: 2, stroke: "#fff" }}
+                                activeDot={{ r: 7 }}
+                            />
+                        </ComposedChart>
+                    </ResponsiveContainer>
+                )}
+            </CardContent>
+        </Card>
+    )
+}

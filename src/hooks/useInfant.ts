@@ -33,3 +33,12 @@ export function useInfantCalculator(params: InfantCalculatorParams) {
         retry: 2,
     })
 }
+
+export const useGetInfantChart = (infantId: number, indicator:string) => {
+    return useQuery({
+        queryKey: ["infant-chart", infantId, indicator],
+        queryFn: () => babyService.getInfantChart(infantId, indicator),
+        staleTime: QUERY_STALE_TIME,
+        retry: 2,
+    })
+}

@@ -31,37 +31,65 @@ function MetricPill({ metric, label }: { metric: MetricResult; label: string }) 
 
     return (
         <div
-            className="flex-1 min-w-0 rounded-xl p-3 space-y-1.5 transition-all"
-            style={{ background: color + "0d", border: `1px solid ${color}25` }}
+            className="flex-1 min-w-0 rounded-xl p-3 space-y-2"
+            style={{ background: color + "0d", border: `0.5px solid ${color}30` }}
         >
+            {/* Header row */}
             <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">{label}</span>
-                {isOk
-                    ? <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
-                    : <AlertCircle className="w-3 h-3 shrink-0" style={{ color }} />
-                }
+                <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
+                    {label}
+                </span>
+                {isOk ? (
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                        <circle cx="8" cy="8" r="7" stroke={color} strokeWidth="1.5" />
+                        <path
+                            d="M5 8.5l2 2 4-4"
+                            stroke={color}
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+                ) : (
+                    <AlertCircle className="w-3 h-3 shrink-0" style={{ color }} />
+                )}
             </div>
-            <p className="text-xl font-bold leading-none" style={{ color }}>
+
+            {/* Percentile */}
+            <p className="text-[22px] font-semibold leading-none" style={{ color }}>
                 {metric.percentile}
-                <span className="text-xs font-medium ml-0.5" style={{ color: color + "aa" }}>%ile</span>
+                <span
+                    className="text-[11px] font-normal ml-0.5"
+                    style={{ color: color + "99" }}
+                >
+                    %ile
+                </span>
             </p>
+
+            {/* Raw value */}
             {metric.raw && (
-                <p className="text-[11px] text-gray-400 font-medium">{metric.raw}</p>
+                <p className="text-[11px] text-gray-400">{metric.raw}</p>
             )}
+
+            {/* Alert level tag */}
             {metric.alert_level && (
-                <p className="text-[10px] font-semibold leading-tight" style={{ color }}>
+                <span
+                    className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-md leading-tight"
+                    style={{ background: color + "20", color }}
+                >
                     {metric.alert_level}
-                </p>
+                </span>
             )}
+
+            {/* App action — only when flagged */}
             {metric.app_action && metric.action_required && (
-                <p className="text-[10px] text-gray-500 leading-tight">
+                <p className="text-[10px] text-gray-400 leading-snug">
                     {metric.app_action}
                 </p>
             )}
         </div>
     )
 }
-
 function HistoryRecordCard({ record, index }: { record: HistoryRecord; index: number }) {
     const [expanded, setExpanded] = useState(false)
 
@@ -72,55 +100,50 @@ function HistoryRecordCard({ record, index }: { record: HistoryRecord; index: nu
     ].filter(m => m.action_required).length
 
     const statusColor = urgentCount === 0 ? "#10b981" : urgentCount === 1 ? "#f59e0b" : "#ef4444"
-    const statusLabel = urgentCount === 0 ? "All Clear" : urgentCount === 1 ? "1 Alert" : `${urgentCount} Alerts`
+    const statusLabel = urgentCount === 0 ? "All clear" : urgentCount === 1 ? "1 alert" : `${urgentCount} alerts`
 
     return (
         <div
-            className="rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-md"
-            style={{
-                border: `1px solid ${statusColor}20`,
-                background: "white",
-                animationDelay: `${index * 60}ms`
-            }}
+            className="rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-sm bg-white"
+            style={{ border: `0.5px solid ${statusColor}25` }}
         >
-            {/* Card header — always visible */}
+            {/* Status accent bar */}
+            <div className="h-[3px] w-full" style={{ background: statusColor }} />
+
+            {/* Card header */}
             <button
                 onClick={() => setExpanded(p => !p)}
-                className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/80 transition-colors"
+                className="w-full text-left px-[18px] py-3.5 flex items-center justify-between gap-3 hover:bg-gray-50/60 transition-colors"
             >
                 <div className="flex items-center gap-3 min-w-0">
-                    {/* Status dot */}
                     <div
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        className="w-2 h-2 rounded-full shrink-0"
                         style={{ background: statusColor, boxShadow: `0 0 0 3px ${statusColor}20` }}
                     />
-
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-semibold text-gray-900">
+                            <span className="text-[13px] font-semibold text-gray-900">
                                 {formatDate(record.recorded_at)}
                             </span>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-[11px] text-gray-400">
                                 {formatTime(record.recorded_at)}
                             </span>
-                            <span
-                                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                style={{ background: "#6366f115", color: "#6366f1" }}
-                            >
+                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-violet-50 text-violet-700">
                                 {record.age_months}mo old
                             </span>
                         </div>
-
-                        {/* Quick metric summary */}
-                        <div className="flex items-center gap-3 mt-1">
+                        <div className="flex items-center gap-4 mt-1">
                             {[
                                 { label: "Wt", v: record.weight_for_age },
                                 { label: "Ht", v: record.height_for_age },
                                 { label: "HC", v: record.head_circumference_for_age },
                             ].map(({ label, v }) => (
-                                <span key={label} className="text-[11px] text-gray-500">
-                                    <span className="font-medium text-gray-400">{label} </span>
-                                    <span className="font-bold" style={{ color: v.color_code ?? "#6b7280" }}>
+                                <span key={label} className="flex items-center gap-1">
+                                    <span className="text-[11px] text-gray-400">{label}</span>
+                                    <span
+                                        className="text-[11px] font-semibold"
+                                        style={{ color: v.color_code ?? "#6b7280" }}
+                                    >
                                         {v.raw ?? `${v.percentile}%`}
                                     </span>
                                 </span>
@@ -131,15 +154,15 @@ function HistoryRecordCard({ record, index }: { record: HistoryRecord; index: nu
 
                 <div className="flex items-center gap-2 shrink-0">
                     <span
-                        className="text-[10px] font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: statusColor + "15", color: statusColor }}
+                        className="text-[10px] font-medium px-2.5 py-1 rounded-full"
+                        style={{ background: `${statusColor}15`, color: statusColor }}
                     >
                         {statusLabel}
                     </span>
-                    <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
                         {expanded
-                            ? <ChevronUp className="w-3.5 h-3.5 text-gray-500" />
-                            : <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                            ? <ChevronUp className="w-3 h-3 text-gray-500" />
+                            : <ChevronDown className="w-3 h-3 text-gray-500" />
                         }
                     </div>
                 </div>
@@ -147,11 +170,11 @@ function HistoryRecordCard({ record, index }: { record: HistoryRecord; index: nu
 
             {/* Expanded metrics */}
             {expanded && (
-                <div className="px-5 pb-5 pt-1 border-t border-gray-50">
-                    <div className="flex gap-3 mt-3">
+                <div className="px-[18px] pb-4 pt-0 border-t border-gray-100">
+                    <div className="grid grid-cols-3 gap-2.5 mt-3">
                         <MetricPill metric={record.weight_for_age} label="Weight" />
                         <MetricPill metric={record.height_for_age} label="Height" />
-                        <MetricPill metric={record.head_circumference_for_age} label="Head Circ." />
+                        <MetricPill metric={record.head_circumference_for_age} label="Head circ." />
                     </div>
                 </div>
             )}
@@ -163,7 +186,7 @@ function HistorySkeletons() {
     return (
         <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="rounded-2xl border border-gray-100 p-5 space-y-3">
+                <div key={i} className="rounded-2xl bg-white border border-gray-100 p-5 space-y-3">
                     <div className="flex items-center gap-3">
                         <Skeleton className="w-2.5 h-2.5 rounded-full" />
                         <Skeleton className="h-4 w-36" />

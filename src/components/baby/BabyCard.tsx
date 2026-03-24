@@ -17,9 +17,11 @@ export interface Baby {
     dob: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     image: string | null;
-    weight: number;
-    height: number;
-    head_circumference: number;
+    recent_record: {
+        weight: string;
+        height: string;
+        head_circumference: string;
+    } | null;
 }
 
 interface BabyCardProps {
@@ -138,7 +140,7 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onDeleteAction}) => {
                 <div
                     className={`bg-gradient-to-br ${getGradient(
                         baby.gender
-                    )} relative h-40 sm:h-48 md:h-56 flex items-center justify-center`}
+                    )} relative h-56 sm:h-64 md:h-72 flex items-center justify-center`}
                 >
                     {baby.image ? (
                         <Image
@@ -221,9 +223,9 @@ const BabyCard: React.FC<BabyCardProps> = ({baby, onDeleteAction}) => {
                     dob: baby.dob,
                     gender: convertGenderToNumber(baby.gender),
                     image: baby.image as any,
-                    height: baby.height,
-                    weight: baby.weight,
-                    head_circumference: baby.head_circumference
+                    height: baby.recent_record ? Number(baby.recent_record.height) : undefined,
+                    weight: baby.recent_record ? Number(baby.recent_record.weight) : undefined,
+                    head_circumference: baby.recent_record ? Number(baby.recent_record.head_circumference) : undefined,
                 }}
                 babyId={baby.id}
                 onCloseAction={() => setIsEditModalOpen(false)}
