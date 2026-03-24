@@ -16,9 +16,11 @@ export interface Baby {
     dob: string;
     gender: "MALE" | "FEMALE" | "OTHER";
     media: string | null;
-    weight: number;
-    height: number;
-    head_circumference: number;
+    recent_record: {
+        weight: string;
+        height: string;
+        head_circumference: string;
+    } | null;
 }
 
 export default function BabyPage() {

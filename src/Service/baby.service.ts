@@ -7,13 +7,14 @@ class BabyService extends HttpService {
 
     async getAllBaby(params?: any) {
         try {
-            return await this.getRequest({
+            const response = await this.getRequest({
                 url: '/infant',
                 config: {
                     params,
                     auth: true
                 }
             })
+            return response
         } catch (error) {
             throw error
 
@@ -140,6 +141,20 @@ class BabyService extends HttpService {
                 config: {
                     auth: true,
                     params
+                }
+            })
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getInfantChart(infantId: number, indicator:string) {
+        try {
+            return await this.getRequest({
+                url: `/infant/${infantId}/chart`,
+                config: {
+                    auth: true,
+                    params: {indicator},
                 }
             })
         } catch (error) {

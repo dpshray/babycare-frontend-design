@@ -2,6 +2,7 @@
 
 import InfantCalculatorForm from "@/components/baby/InfantCalculatorForm"
 import InfantCalculatorHistory from "@/components/baby/InfantCalculatorHistory"
+import InfantGrowthChart from "@/components/baby/InfantGrowthChart"
 import { useParams } from "next/navigation"
 
 export default function InfantCalculationPage() {
@@ -20,7 +21,6 @@ export default function InfantCalculationPage() {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 md:p-8">
             <div className="max-w-7xl mx-auto space-y-8">
 
-                {/* Page header */}
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Infant Growth Tracker</h1>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -28,10 +28,10 @@ export default function InfantCalculationPage() {
                     </p>
                 </div>
 
-                {/* Calculator form — full width */}
                 <InfantCalculatorForm infantId={infantId} />
 
-                {/* History — full width below */}
+                <InfantGrowthChart infantId={infantId} />
+
                 <InfantCalculatorHistory infantId={infantId} />
 
             </div>

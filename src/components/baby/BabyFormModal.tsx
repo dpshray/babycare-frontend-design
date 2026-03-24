@@ -15,9 +15,9 @@ interface BabyFormData {
     name: string;
     dob: string;
     gender: 0 | 1;
-    weight: number;
-    height: number;
-    head_circumference: number;
+    weight?: number;
+    height?: number;
+    head_circumference?: number;
     image?: File;
 }
 
@@ -229,58 +229,60 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
                     </div>
 
                     {/* Weight, Height, Head Circumference */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <TextInputField
-                            label="Weight (kg)"
-                            type="number"
-                            placeholder="e.g. 3.5"
-                            required
-                            disabled={isDisabled}
-                            error={errors.weight?.message}
-                            step="0.01"
-                            min="0"
-                            {...register("weight", {
-                                required: "Weight is required",
-                                valueAsNumber: true,
-                                min: { value: 0, message: "Weight must be positive" },
-                                validate: (v) => !isNaN(v) || "Must be a valid number",
-                            })}
-                        />
+                    {!isEditMode && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <TextInputField
+                                label="Weight (kg)"
+                                type="number"
+                                placeholder="e.g. 3.5"
+                                required
+                                disabled={isDisabled}
+                                error={errors.weight?.message}
+                                step="0.01"
+                                min="0"
+                                {...register("weight", {
+                                    required: "Weight is required",
+                                    valueAsNumber: true,
+                                    min: { value: 0, message: "Weight must be positive" },
+                                validate: (v) => (v !== undefined && !isNaN(v)) || "Must be a valid number",
+                                })}
+                            />
 
-                        <TextInputField
-                            label="Height (cm)"
-                            type="number"
-                            placeholder="e.g. 50"
-                            required
-                            disabled={isDisabled}
-                            error={errors.height?.message}
-                            step="0.1"
-                            min="0"
-                            {...register("height", {
-                                required: "Height is required",
-                                valueAsNumber: true,
-                                min: { value: 0, message: "Height must be positive" },
-                                validate: (v) => !isNaN(v) || "Must be a valid number",
-                            })}
-                        />
+                            <TextInputField
+                                label="Height (cm)"
+                                type="number"
+                                placeholder="e.g. 50"
+                                required
+                                disabled={isDisabled}
+                                error={errors.height?.message}
+                                step="0.1"
+                                min="0"
+                                {...register("height", {
+                                    required: "Height is required",
+                                    valueAsNumber: true,
+                                    min: { value: 0, message: "Height must be positive" },
+                                validate: (v) => (v !== undefined && !isNaN(v)) || "Must be a valid number",
+                                })}
+                            />
 
-                        <TextInputField
-                            label="Head Circ. (cm)"
-                            type="number"
-                            placeholder="e.g. 34"
-                            required
-                            disabled={isDisabled}
-                            error={errors.head_circumference?.message}
-                            step="0.1"
-                            min="0"
-                            {...register("head_circumference", {
-                                required: "Head circumference is required",
-                                valueAsNumber: true,
-                                min: { value: 0, message: "Must be positive" },
-                                validate: (v) => !isNaN(v) || "Must be a valid number",
-                            })}
-                        />
-                    </div>
+                            <TextInputField
+                                label="Head Circ. (cm)"
+                                type="number"
+                                placeholder="e.g. 34"
+                                required
+                                disabled={isDisabled}
+                                error={errors.head_circumference?.message}
+                                step="0.1"
+                                min="0"
+                                {...register("head_circumference", {
+                                    required: "Head circumference is required",
+                                    valueAsNumber: true,
+                                    min: { value: 0, message: "Must be positive" },
+                                validate: (v) => (v !== undefined && !isNaN(v)) || "Must be a valid number",
+                                })}
+                            />
+                        </div>
+                    )}
 
                     {/* Image */}
                     <div className="space-y-2">
