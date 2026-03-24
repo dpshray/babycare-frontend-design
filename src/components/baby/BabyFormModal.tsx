@@ -96,20 +96,29 @@ const BabyFormModal: React.FC<BabyModalProps> = ({
         async (data: BabyFormData) => {
             try {
                 const formData = new FormData();
-                formData.append("name", data.name);
-                formData.append("dob", data.dob);
-                formData.append("gender", String(data.gender));
-                formData.append("weight", String(data.weight));
-                formData.append("height", String(data.height));
-                formData.append("head_circumference", String(data.head_circumference));
-                if (selectedFile) formData.append("image", selectedFile);
 
                 if (mode === "create") {
+                    formData.append("name", data.name);
+                    formData.append("dob", data.dob);
+                    formData.append("gender", String(data.gender));
+                    formData.append("weight", String(data.weight));
+                    formData.append("height", String(data.height));
+                    formData.append("head_circumference", String(data.head_circumference));
+                    if (selectedFile) formData.append("image", selectedFile);
+
                     await babyService.addBaby(formData);
                 } else {
                     if (!babyId) throw new Error("Baby ID is required for update");
+
+                    // Only send changed/present fields on edit
+                    if (data.name)   formData.append("name", data.name);
+                    if (data.dob)    formData.append("dob", data.dob);
+                    if (data.gender !== undefined) formData.append("gender", String(data.gender));
+                    if (selectedFile) formData.append("image", selectedFile);
+
                     await babyService.updateBaby(babyId, formData);
                 }
+
                 toast.success("Baby data submitted successfully");
                 onSubmitAction?.();
                 onCloseAction();
