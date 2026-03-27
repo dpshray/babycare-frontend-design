@@ -41,8 +41,8 @@ export interface ProductData {
   price: number;
   previous_price: number;
   discount_percent: number;
-  age_group_year_from: number;
-  age_group_year_to: number;
+  age_group_year_from?: string;
+  age_group_year_to?: string;
   size: string;
   brand: string;
   description: string;
@@ -400,13 +400,14 @@ export default function ProductDetail() {
 
               <div className="border-t border-b py-3 sm:py-4 space-y-3">
                 <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Age Range: </span>
-                    <span className="font-semibold">
-                      {product.age_group_year_from}-{product.age_group_year_to}{" "}
-                      years
-                    </span>
-                  </div>
+                  {(product.age_group_year_from || product.age_group_year_to) && (
+                    <div>
+                      <span className="text-muted-foreground">Age Range: </span>
+                      <span className="font-semibold">
+                        {product.age_group_year_from ?? "—"} - {product.age_group_year_to ?? "—"}
+                      </span>
+                    </div>
+                  )}
                   <div>
                     <span className="text-muted-foreground">Size: </span>
                     <span className="font-semibold">{product.size}</span>
