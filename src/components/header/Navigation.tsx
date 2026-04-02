@@ -454,6 +454,27 @@ export default function NavigationBar({ className }: { className?: string }) {
               {user ? (
                 <div className="sm:hidden border-t pt-2 mt-2 space-y-1">
                   <Link
+                    href="/profile"
+                    onClick={closeMobileMenu}
+                    className="py-2.5 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors flex items-center gap-2 font-medium"
+                  >
+                    <User className="h-4 w-4" /> Profile
+                  </Link>
+                  <Link
+                    href="/baby"
+                    onClick={closeMobileMenu}
+                    className="py-2.5 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors flex items-center gap-2 font-medium"
+                  >
+                    <Baby className="h-4 w-4" /> Baby
+                  </Link>
+                  <Link
+                    href="/order"
+                    onClick={closeMobileMenu}
+                    className="py-2.5 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors flex items-center gap-2 font-medium"
+                  >
+                    <Package className="h-4 w-4" /> Orders
+                  </Link>
+                  <Link
                     href="/cart"
                     onClick={closeMobileMenu}
                     className="py-2.5 px-3 text-sm text-muted-foreground hover:text-primary hover:bg-muted rounded-md transition-colors flex items-center justify-between"
